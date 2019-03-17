@@ -8,6 +8,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	let playerCategory: UInt32 = 0x1 << 0 //1
 	let groundCategory: UInt32 = 0x1 << 1 //2
+	let goalCategory:   UInt32 = 0x1 << 2 //4
 	
 	var leftPressed = false
 	var rightPressed = false
@@ -62,6 +63,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		platform.physicsBody?.categoryBitMask = groundCategory
 		platform.physicsBody?.contactTestBitMask = playerCategory
 		
+		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 100, height: 100))
+		
+		goal.fillColor = .red
+		goal.position = CGPoint(x: 0, y: -150)
+		
+		self.addChild(goal)
+		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
+		goal.physicsBody?.affectedByGravity = false
+		goal.physicsBody?.isDynamic = false
+		
+		goal.physicsBody?.categoryBitMask = goalCategory
+		goal.physicsBody?.contactTestBitMask = playerCategory
+		
     }
 	
 	func didBegin(_ contact: SKPhysicsContact) {
@@ -70,7 +84,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		touchingGround = true
 		
 		if collision == playerCategory | groundCategory {
-			print("collision occured")
+			print("collision between ground and player occured")
+		}
+		
+		if collision == playerCategory | goalCategory {
+			print("collision between goal and player occured")
 		}
 	}
 	
@@ -143,7 +161,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			thePlayer.position.x += 10
 		}
 		if upPressed && touchingGround {
-			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
+			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 			touchingGround = false
 		}
     }
