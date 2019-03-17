@@ -29,7 +29,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		thePlayer.fillColor = .red
+		//thePlayer.fillColor = .red
 		thePlayer.position = CGPoint(x: -200, y: -100)
 			
 		thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: thePlayer.frame.size)
@@ -50,6 +50,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 												CGPoint(x: 50, y: 50)
 												]
 		
+		//levels will be something like this:
+		/*
+		class Level {
+			var platformFormation: [([Platform],[CGPoint])]
+		}
+		let levelsArray: [Level] = []
+		*/
+		
 		for index in 0..<platformArray.count {
 			platformArray[index].setupProperties(pos: platformPositionArray[index])
 			self.addChild(platformArray[index])
@@ -66,6 +74,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.isDynamic = false
 		floor.physicsBody?.restitution = 0.0
 		
+		//floor.fillShader = SKShader(fileNamed: "inkBlobShader")
+		
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
 		
@@ -81,6 +91,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		goal.physicsBody?.categoryBitMask = goalCategory
 		goal.physicsBody?.contactTestBitMask = playerCategory
+		
+		var shaderTest: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
+		shaderTest.fillColor = .red
+		shaderTest.fillShader = SKShader(fileNamed: "inkBlobShader.fsh")
+		self.addChild(shaderTest)
 		
     }
 	
