@@ -8,6 +8,9 @@ let playerCategory: UInt32 = 0x1 << 0 //1
 let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
+//change debug mode to true to see things more clearly
+let debugMode = true
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	var leftPressed = false
@@ -21,7 +24,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMove(to view: SKView) {
 		
-		//self.backgroundColor = .white
+		//set the bg to white if we aren't debugging
+		if(!debugMode) {self.backgroundColor = .white}
 		
 		self.physicsWorld.contactDelegate = self
 		
@@ -169,7 +173,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 ///PLATFORM///
 public class Platform: SKShapeNode {
 	func setupProperties(pos: CGPoint) {
-		self.fillColor = .red
+		if(debugMode) {self.fillColor = .red}
+		else {self.fillColor = .white}
+		
 		self.position = pos
 		self.physicsBody = SKPhysicsBody(rectangleOf: self.frame.size)
 		self.physicsBody?.affectedByGravity = false
