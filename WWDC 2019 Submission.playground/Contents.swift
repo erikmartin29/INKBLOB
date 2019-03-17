@@ -4,11 +4,11 @@ import PlaygroundSupport
 import SpriteKit
 import Carbon.HIToolbox
 
+let playerCategory: UInt32 = 0x1 << 0 //1
+let groundCategory: UInt32 = 0x1 << 1 //2
+let goalCategory:   UInt32 = 0x1 << 2 //4
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
-	
-	let playerCategory: UInt32 = 0x1 << 0 //1
-	let groundCategory: UInt32 = 0x1 << 1 //2
-	let goalCategory:   UInt32 = 0x1 << 2 //4
 	
 	var leftPressed = false
 	var rightPressed = false
@@ -21,18 +21,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMove(to view: SKView) {
 		
+		//self.backgroundColor = .white
+		
 		self.physicsWorld.contactDelegate = self
 		
 		thePlayer.fillColor = .red
-		thePlayer.position = CGPoint(x: 200, y: 200)
+		thePlayer.position = CGPoint(x: -200, y: -100)
 			
 		thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: thePlayer.frame.size)
 		thePlayer.physicsBody?.affectedByGravity = true
+		thePlayer.physicsBody?.restitution = 0.0
 		
 		thePlayer.physicsBody?.categoryBitMask = playerCategory
 		thePlayer.physicsBody?.collisionBitMask = groundCategory
 		
 		self.addChild(thePlayer)
+		
+		let platformArray: [Platform] = [  Platform(rectOf: CGSize(width: 200, height: 100)),
+										   Platform(rectOf: CGSize(width: 200, height: 100))
+										]
+		
+		let platformPositionArray: [CGPoint] = [
+												CGPoint(x: 0, y: -200),
+												CGPoint(x: 50, y: 50)
+												]
+		
+		for index in 0..<platformArray.count {
+			platformArray[index].setupProperties(pos: platformPositionArray[index])
+			self.addChild(platformArray[index])
+		}
 		
 		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
 		
@@ -48,25 +65,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
 		
-		//TODO: Steamline creation of platforms
-		let platform: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 200, height: 100))
-		
-		platform.fillColor = .white
-		platform.position = CGPoint(x: 0, y: -200)
-		
-		self.addChild(platform)
-		platform.physicsBody = SKPhysicsBody(rectangleOf: platform.frame.size)
-		platform.physicsBody?.affectedByGravity = false
-		platform.physicsBody?.isDynamic = false
-		platform.physicsBody?.restitution = 0.0
-		
-		platform.physicsBody?.categoryBitMask = groundCategory
-		platform.physicsBody?.contactTestBitMask = playerCategory
-		
-		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 100, height: 100))
+		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
 		
 		goal.fillColor = .red
-		goal.position = CGPoint(x: 0, y: -150)
+		goal.position = CGPoint(x: 300, y: 300)
 		
 		self.addChild(goal)
 		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
@@ -130,8 +132,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			rightPressed = true
 		case kVK_UpArrow:
 			upPressed = true
-		case kVK_DownArrow:
-			downPressed = true
 		default:
 			break
 		}
@@ -145,8 +145,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			rightPressed = false
 		case kVK_UpArrow:
 			upPressed = false
-		case kVK_DownArrow:
-			downPressed = false
 		default:
 			break
 		}
@@ -161,10 +159,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			thePlayer.position.x += 10
 		}
 		if upPressed && touchingGround {
-			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
+			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 15))
 			touchingGround = false
 		}
     }
+}
+
+
+///PLATFORM///
+public class Platform: SKShapeNode {
+	func setupProperties(pos: CGPoint) {
+		self.fillColor = .red
+		self.position = pos
+		self.physicsBody = SKPhysicsBody(rectangleOf: self.frame.size)
+		self.physicsBody?.affectedByGravity = false
+		self.physicsBody?.isDynamic = false
+		self.physicsBody?.restitution = 0.0
+		self.physicsBody?.categoryBitMask = groundCategory
+		self.physicsBody?.contactTestBitMask = playerCategory
+	}
 }
 
 // Load the SKScene from 'GameScene.sks'
