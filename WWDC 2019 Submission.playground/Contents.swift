@@ -47,10 +47,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
 		
+		//TODO: Steamline creation of platforms
+		let platform: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 200, height: 100))
+		
+		platform.fillColor = .white
+		platform.position = CGPoint(x: 0, y: -200)
+		
+		self.addChild(platform)
+		platform.physicsBody = SKPhysicsBody(rectangleOf: platform.frame.size)
+		platform.physicsBody?.affectedByGravity = false
+		platform.physicsBody?.isDynamic = false
+		platform.physicsBody?.restitution = 0.0
+		
+		platform.physicsBody?.categoryBitMask = groundCategory
+		platform.physicsBody?.contactTestBitMask = playerCategory
+		
     }
 	
 	func didBegin(_ contact: SKPhysicsContact) {
-		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyA.categoryBitMask
+		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
 		
 		touchingGround = true
 		
