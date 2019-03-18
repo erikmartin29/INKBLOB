@@ -9,7 +9,7 @@ let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
-let debugMode = true
+let debugMode = false
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
 	
@@ -86,6 +86,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.addChild(goal)
 		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
+		goal.fillColor = .white
 		goal.physicsBody?.affectedByGravity = false
 		goal.physicsBody?.isDynamic = false
 		
@@ -95,7 +96,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		var shaderTest: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
 		shaderTest.fillColor = .red
 		shaderTest.fillShader = SKShader(fileNamed: "inkBlobShader.fsh")
+		shaderTest.zPosition = -1
 		self.addChild(shaderTest)
+		
+		var shaderTest2: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
+		shaderTest2.fillColor = .red
+		shaderTest2.position = CGPoint(x: 100, y: 200)
+		shaderTest2.fillShader = SKShader(fileNamed: "inkBlobShader.fsh")
+		shaderTest2.zPosition = -1
+		self.addChild(shaderTest2)
 		
     }
 	
