@@ -93,18 +93,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		goal.physicsBody?.categoryBitMask = goalCategory
 		goal.physicsBody?.contactTestBitMask = playerCategory
 		
-		var shaderTest: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
-		shaderTest.fillColor = .red
-		shaderTest.fillShader = SKShader(fileNamed: "inkBlobShader.fsh")
-		shaderTest.zPosition = -1
+		var shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
+		shaderTest.setupProperties(pos: CGPoint(x: 0, y: 0))
 		self.addChild(shaderTest)
 		
-		var shaderTest2: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
+		delay(2){
+		var shaderTest2: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
+		shaderTest2.setupProperties(pos: CGPoint(x: 100, y: 200))
+		self.addChild(shaderTest2)
+		}
+		
+		/*var shaderTest2: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
 		shaderTest2.fillColor = .red
+		shaderTest2.strokeColor = .clear
 		shaderTest2.position = CGPoint(x: 100, y: 200)
 		shaderTest2.fillShader = SKShader(fileNamed: "inkBlobShader.fsh")
 		shaderTest2.zPosition = -1
-		self.addChild(shaderTest2)
+		self.addChild(shaderTest2)*/
 		
     }
 	
@@ -179,6 +184,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
     
     override func update(_ currentTime: TimeInterval) {
+		
+		//print(updatingVariable)
+		
         // Called before each frame is rendered
 		if leftPressed {
 			thePlayer.position.x -= 10
@@ -193,6 +201,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 }
 
+///INKBLOB///
+public class InkBlob: SKShapeNode{
+	func setupProperties(pos: CGPoint) {
+		self.fillColor = .red
+		self.strokeColor = .clear
+		self.position = pos
+		
+		var shader = SKShader(fileNamed: "inkBlobShader.fsh")
+		self.fillShader = shader
+		
+		var updatingVariable: Float = 0
+		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
+		
+		let blockAction = SKAction.run { () -> Void in
+			updatingVariable += 0.016666667
+			shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
+			//print("aaaa")
+		}
+		let waitAction = SKAction.wait(forDuration:0.016666667)
+		let sequenceAction = SKAction.sequence([waitAction, blockAction])
+		let repeatAction = SKAction.repeatForever(sequenceAction)
+		self.run(repeatAction)
+		
+		self.zPosition = -1
+	}
+}
 
 ///PLATFORM///
 public class Platform: SKShapeNode {
@@ -209,6 +243,15 @@ public class Platform: SKShapeNode {
 		self.physicsBody?.contactTestBitMask = playerCategory
 	}
 }
+
+
+//delays animations, this makes the code musch easier to read
+public func delay(_ delay: Double, closure: @escaping ()->()) {
+	let when = DispatchTime.now() + delay
+	DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
+}
+
+
 
 // Load the SKScene from 'GameScene.sks'
 let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
