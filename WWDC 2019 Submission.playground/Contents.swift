@@ -74,8 +74,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.isDynamic = false
 		floor.physicsBody?.restitution = 0.0
 		
-		//floor.fillShader = SKShader(fileNamed: "inkBlobShader")
-		
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
 		
@@ -92,24 +90,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		goal.physicsBody?.categoryBitMask = goalCategory
 		goal.physicsBody?.contactTestBitMask = playerCategory
-		
-		var shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
-		shaderTest.setupProperties(pos: CGPoint(x: 0, y: 0))
-		self.addChild(shaderTest)
-		
-		delay(2){
-		var shaderTest2: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
-		shaderTest2.setupProperties(pos: CGPoint(x: 100, y: 200))
-		self.addChild(shaderTest2)
-		}
-		
-		/*var shaderTest2: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 800, height: 800))
-		shaderTest2.fillColor = .red
-		shaderTest2.strokeColor = .clear
-		shaderTest2.position = CGPoint(x: 100, y: 200)
-		shaderTest2.fillShader = SKShader(fileNamed: "inkBlobShader.fsh")
-		shaderTest2.zPosition = -1
-		self.addChild(shaderTest2)*/
 		
     }
 	
@@ -137,6 +117,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func touchDown(atPoint pos : CGPoint) {
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
+		shaderTest.setupProperties(pos: pos)
+		self.addChild(shaderTest)
     }
     
     func touchMoved(toPoint pos : CGPoint) {
@@ -203,28 +186,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
 ///INKBLOB///
 public class InkBlob: SKShapeNode{
+	//TODO: make this not ugly
 	func setupProperties(pos: CGPoint) {
 		self.fillColor = .red
 		self.strokeColor = .clear
 		self.position = pos
+		self.zPosition = -1
 		
-		var shader = SKShader(fileNamed: "inkBlobShader.fsh")
+		let shader = SKShader(fileNamed: "inkBlobShader.fsh")
 		self.fillShader = shader
 		
 		var updatingVariable: Float = 0
 		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		
+		//ew this code is bad fix me
 		let blockAction = SKAction.run { () -> Void in
 			updatingVariable += 0.016666667
 			shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
-			//print("aaaa")
 		}
 		let waitAction = SKAction.wait(forDuration:0.016666667)
 		let sequenceAction = SKAction.sequence([waitAction, blockAction])
-		let repeatAction = SKAction.repeatForever(sequenceAction)
+		let repeatAction = SKAction.repeat(sequenceAction, count: 360)
 		self.run(repeatAction)
-		
-		self.zPosition = -1
 	}
 }
 

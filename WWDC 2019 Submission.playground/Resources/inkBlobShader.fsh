@@ -3,11 +3,10 @@ bool DE( vec2 pp, float t )
 	pp.y += (
 			 .4 * sin(.5*2.3*pp.x+pp.y) +
 			 .2 * sin(.5*5.5*pp.x+pp.y) +
-			 0.1*sin(.5*13.7*pp.x )+
+			 0.1* sin(.5*13.7*pp.x )+
 			 0.06*sin(.5*23.*pp.x ));
 	
-	pp.y += (
-			 .4 * sin(.5*2.3*pp.x+pp.y * t));
+	pp.y += (.4 * sin(.5*2.3*pp.x+pp.y * t));
 	
 	pp += vec2(0.,0.4)*t;
 	
