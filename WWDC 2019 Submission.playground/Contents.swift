@@ -35,37 +35,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		loadLevel(levelID: level2)
-
-		thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: thePlayer.frame.size)
-		thePlayer.physicsBody?.affectedByGravity = true
-		thePlayer.physicsBody?.restitution = 0.0
-		thePlayer.physicsBody?.categoryBitMask = playerCategory
-		thePlayer.physicsBody?.collisionBitMask = groundCategory
+		self.introAnimation()
 		
-		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
-		floor.fillColor = .white
-		floor.position = CGPoint(x: 0, y: -350)
-		floor.physicsBody = SKPhysicsBody(rectangleOf: floor.frame.size)
-		floor.physicsBody?.affectedByGravity = false
-		floor.physicsBody?.isDynamic = false
-		floor.physicsBody?.restitution = 0.0
-		floor.physicsBody?.categoryBitMask = groundCategory
-		floor.physicsBody?.contactTestBitMask = playerCategory
-		self.addChild(floor)
-
-		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
-		goal.fillColor = .red
-		goal.position = CGPoint(x: 300, y: 300)
-		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
-		goal.fillColor = .white
-		goal.physicsBody?.affectedByGravity = false
-		goal.physicsBody?.isDynamic = false
-		goal.physicsBody?.categoryBitMask = goalCategory
-		goal.physicsBody?.contactTestBitMask = playerCategory
-		self.addChild(goal)
+		//self.addChild(thePlayer)
 		
+		//delay(4){
+		self.loadLevel(levelID: self.level1)
+		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
+		self.thePlayer.physicsBody?.affectedByGravity = true
+		self.thePlayer.physicsBody?.restitution = 0.0
+		self.thePlayer.physicsBody?.categoryBitMask = playerCategory
+		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
     }
+	
+	func introAnimation() {
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
+		shaderTest.setupProperties(pos: CGPoint(x: 0, y: 0))
+		self.addChild(shaderTest)
+	}
 	
 	//TODO: levelID is a bad param name think of a new one later
 	func loadLevel(levelID: Level) {
@@ -80,6 +67,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		//add player at position
 		thePlayer.position = level.playerStartPosition
 		self.addChild(thePlayer)
+		
+		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
+		floor.fillColor = .white
+		floor.position = CGPoint(x: 0, y: -350)
+		floor.physicsBody = SKPhysicsBody(rectangleOf: floor.frame.size)
+		floor.physicsBody?.affectedByGravity = false
+		floor.physicsBody?.isDynamic = false
+		floor.physicsBody?.restitution = 0.0
+		floor.physicsBody?.categoryBitMask = groundCategory
+		floor.physicsBody?.contactTestBitMask = playerCategory
+		self.addChild(floor)
+		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
+		goal.fillColor = .red
+		goal.position = CGPoint(x: 300, y: 300)
+		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
+		goal.fillColor = .white
+		goal.physicsBody?.affectedByGravity = false
+		goal.physicsBody?.isDynamic = false
+		goal.physicsBody?.categoryBitMask = goalCategory
+		goal.physicsBody?.contactTestBitMask = playerCategory
+		self.addChild(goal)
 	}
 	
 	func didBegin(_ contact: SKPhysicsContact) {
@@ -93,6 +101,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		if collision == playerCategory | goalCategory {
 			print("collision between goal and player occured")
+			//TODO: maybe animate this?
+			self.removeAllChildren()
+			self.loadLevel(levelID: level2)
 		}
 	}
 	
@@ -111,7 +122,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
     func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
-		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 		shaderTest.setupProperties(pos: pos)
 		self.addChild(shaderTest)
     }
@@ -192,7 +203,7 @@ public class InkBlob: SKShapeNode{
 		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		
 		//this is awful pls fix
-		var speedFactor = 1.0
+		var speedFactor = 2.0
 		let timer : Timer?
 		timer =  Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true, block: { (Timer) in
 			speedFactor += 0.02
@@ -214,7 +225,6 @@ public class InkBlob: SKShapeNode{
 				timer2?.invalidate()
 			}
 		}
-		
 	}
 	
 	func updateVar() {
