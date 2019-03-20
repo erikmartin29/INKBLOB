@@ -9,7 +9,7 @@ let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
-let debugMode = false
+let debugMode = true
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
 	
@@ -21,6 +21,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var touchingGround = false
 	
 	let thePlayer: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 20, height: 20))
+	
+	///level loading///
+	//TODO: parse this data in a file (maybe JSON?)
+	//let levelsArray: [Level] = []
+	let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50))
+	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))
     
     override func didMove(to view: SKView) {
 		
@@ -29,69 +35,52 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		//thePlayer.fillColor = .red
-		thePlayer.position = CGPoint(x: -200, y: -100)
-			
+		loadLevel(levelID: level2)
+
 		thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: thePlayer.frame.size)
 		thePlayer.physicsBody?.affectedByGravity = true
 		thePlayer.physicsBody?.restitution = 0.0
-		
 		thePlayer.physicsBody?.categoryBitMask = playerCategory
 		thePlayer.physicsBody?.collisionBitMask = groundCategory
 		
-		self.addChild(thePlayer)
-		
-		let platformArray: [Platform] = [  Platform(rectOf: CGSize(width: 200, height: 100)),
-										   Platform(rectOf: CGSize(width: 200, height: 100))
-										]
-		
-		let platformPositionArray: [CGPoint] = [
-												CGPoint(x: 0, y: -200),
-												CGPoint(x: 50, y: 50)
-												]
-		
-		//levels will be something like this:
-		/*
-		class Level {
-			var platformFormation: [([Platform],[CGPoint])]
-		}
-		let levelsArray: [Level] = []
-		*/
-		
-		for index in 0..<platformArray.count {
-			platformArray[index].setupProperties(pos: platformPositionArray[index])
-			self.addChild(platformArray[index])
-		}
-		
 		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
-		
 		floor.fillColor = .white
 		floor.position = CGPoint(x: 0, y: -350)
-		
-		self.addChild(floor)
 		floor.physicsBody = SKPhysicsBody(rectangleOf: floor.frame.size)
 		floor.physicsBody?.affectedByGravity = false
 		floor.physicsBody?.isDynamic = false
 		floor.physicsBody?.restitution = 0.0
-		
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
-		
+		self.addChild(floor)
+
 		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
-		
 		goal.fillColor = .red
 		goal.position = CGPoint(x: 300, y: 300)
-		
-		self.addChild(goal)
 		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
 		goal.fillColor = .white
 		goal.physicsBody?.affectedByGravity = false
 		goal.physicsBody?.isDynamic = false
-		
 		goal.physicsBody?.categoryBitMask = goalCategory
 		goal.physicsBody?.contactTestBitMask = playerCategory
+		self.addChild(goal)
 		
     }
+	
+	//TODO: levelID is a bad param name think of a new one later
+	func loadLevel(levelID: Level) {
+		let level = levelID
+		//add platforms
+		for index in 0..<level.platformFormation.count {
+			let platform = level.platformFormation[index].0
+			let platformPos = level.platformFormation[index].1
+			platform.setupProperties(pos: platformPos)
+			self.addChild(platform)
+		}
+		//add player at position
+		thePlayer.position = level.playerStartPosition
+		self.addChild(thePlayer)
+	}
 	
 	func didBegin(_ contact: SKPhysicsContact) {
 		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
@@ -115,8 +104,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             return true
         }
     }
-    
+	
+	/////////////////////
+	///MOUSE HANDLERS////
+    /////////////////////
+	
     func touchDown(atPoint pos : CGPoint) {
+		//possibly make it so that ink bleed until mouse is released??
 		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
 		shaderTest.setupProperties(pos: pos)
 		self.addChild(shaderTest)
@@ -139,6 +133,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func mouseUp(with event: NSEvent) {
         touchUp(atPoint: event.location(in: self))
     }
+	
+	///////////////////
+	///KEY HANDLERS////
+	///////////////////
 	
 	override func keyDown(with event: NSEvent) {
 		switch Int(event.keyCode) {
@@ -167,18 +165,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
     
     override func update(_ currentTime: TimeInterval) {
-		
-		//print(updatingVariable)
-		
         // Called before each frame is rendered
-		if leftPressed {
-			thePlayer.position.x -= 10
-		}
-		if rightPressed {
-			thePlayer.position.x += 10
-		}
+		if leftPressed  { thePlayer.position.x -= 10 }
+		if rightPressed { thePlayer.position.x += 10 }
 		if upPressed && touchingGround {
-			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 15))
+			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 			touchingGround = false
 		}
     }
@@ -196,27 +187,51 @@ public class InkBlob: SKShapeNode{
 		let shader = SKShader(fileNamed: "inkBlobShader.fsh")
 		self.fillShader = shader
 		
+		//TODO: smooth animation curves
 		var updatingVariable: Float = 0
 		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		
-		//ew this code is bad fix me
-		let blockAction = SKAction.run { () -> Void in
-			updatingVariable += 0.016666667
+		//this is awful pls fix
+		var speedFactor = 1.0
+		let timer : Timer?
+		timer =  Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true, block: { (Timer) in
+			speedFactor += 0.02
+			updatingVariable += Float(0.016666667 * speedFactor)
 			shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
+		})
+		delay(1.0) {
+			timer?.invalidate()
+			
+			let timer2 : Timer?
+			timer2 =  Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true, block: { (Timer) in
+				speedFactor -= 0.019
+				print(speedFactor)
+				updatingVariable += Float(0.016666667 * speedFactor)
+				shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
+			})
+			
+			delay(1.0) {
+				timer2?.invalidate()
+			}
 		}
-		let waitAction = SKAction.wait(forDuration:0.016666667)
-		let sequenceAction = SKAction.sequence([waitAction, blockAction])
-		let repeatAction = SKAction.repeat(sequenceAction, count: 360)
-		self.run(repeatAction)
+		
+	}
+	
+	func updateVar() {
+		
+		//speedFactor += 0.1
+		//updatingVariable += Float(0.016666667 * speedFactor)
+		//shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
+		//SKAction.wait(forDuration:0.016666667)
 	}
 }
 
 ///PLATFORM///
 public class Platform: SKShapeNode {
+	
 	func setupProperties(pos: CGPoint) {
 		if(debugMode) {self.fillColor = .red}
 		else {self.fillColor = .white}
-		
 		self.position = pos
 		self.physicsBody = SKPhysicsBody(rectangleOf: self.frame.size)
 		self.physicsBody?.affectedByGravity = false
@@ -227,6 +242,16 @@ public class Platform: SKShapeNode {
 	}
 }
 
+//levels will be something like this:
+class Level {
+	var platformFormation: [(Platform,CGPoint)]
+	var playerStartPosition: CGPoint
+	
+	init(formation: [(Platform,CGPoint)], playerStartPos: CGPoint) {
+		platformFormation = formation
+		playerStartPosition = playerStartPos
+	}
+}
 
 //delays animations, this makes the code musch easier to read
 public func delay(_ delay: Double, closure: @escaping ()->()) {
