@@ -8,6 +8,8 @@ let playerCategory: UInt32 = 0x1 << 0 //1
 let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
+
+
 //change debug mode to true to see things more clearly
 let debugMode = true
 
@@ -27,6 +29,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	//let levelsArray: [Level] = []
 	let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50))
 	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))
+	
+	//make it so that I can use those varibles ^^^
+	let levelsArray: [Level] = [
+		Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
+		]
+	
+	var currentLevel = 1
     
     override func didMove(to view: SKView) {
 		
@@ -40,7 +50,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		//self.addChild(thePlayer)
 		
 		//delay(4){
-		self.loadLevel(levelID: self.level1)
+		self.loadLevel(self.levelsArray[0])
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
 		self.thePlayer.physicsBody?.restitution = 0.0
@@ -55,8 +65,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	//TODO: levelID is a bad param name think of a new one later
-	func loadLevel(levelID: Level) {
-		let level = levelID
+	func loadLevel(_ level: Level) {
+		////INSERT ANIMTION HERE LATER/////
 		//add platforms
 		for index in 0..<level.platformFormation.count {
 			let platform = level.platformFormation[index].0
@@ -103,7 +113,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			print("collision between goal and player occured")
 			//TODO: maybe animate this?
 			self.removeAllChildren()
-			self.loadLevel(levelID: level2)
+			print(currentLevel)
+			if(currentLevel < levelsArray.count) {
+				self.loadLevel(levelsArray[currentLevel])
+				currentLevel += 1
+			} else {
+				print("WINNER!")
+				//WIN ANIMATION
+			}
 		}
 	}
 	
