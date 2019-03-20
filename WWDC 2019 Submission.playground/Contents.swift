@@ -8,12 +8,25 @@ let playerCategory: UInt32 = 0x1 << 0 //1
 let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
-
-
 //change debug mode to true to see things more clearly
-let debugMode = true
+let debugMode = false
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+	
+	//this works for now but find a better solution
+	//-1: incomplete, notstarted
+	//0: in progress
+	//1: complete
+	var tutorialStep1Completion = -1
+	var tutorialStep2Completion = -1
+	var tutorialStep3Completion = -1
+	
+	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
+	let label2 = SKLabelNode(text: "Click here to continue.")
+	let label3 = SKLabelNode(text: "This is your player")
+	let label4 = SKLabelNode(text: "Click here to continue.")
+	let label5 = SKLabelNode(text: "This is your goal.")
+	let label6 = SKLabelNode(text: "Use your arrow keys to move")
 	
 	var leftPressed = false
 	var rightPressed = false
@@ -45,12 +58,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		self.introAnimation()
+		//self.introAnimation()
+		//self.loadLevel(self.levelsArray[0])
+		startTutorial()
 		
-		//self.addChild(thePlayer)
-		
-		//delay(4){
-		self.loadLevel(self.levelsArray[0])
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
 		self.thePlayer.physicsBody?.restitution = 0.0
@@ -58,8 +69,51 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
     }
 	
+	//make this better it sucks
+	func startTutorial() {
+		self.tutorialStep1Completion = 0
+		label1.fontColor = .black
+		addChild(label1)
+		delay(2.0) {
+		self.label1.removeFromParent()
+		self.label2.fontColor = .black
+		self.addChild(self.label2)
+		self.tutorialStep1Completion = 1
+		//TODO: add arrow
+		}
+	}
+	
+	//find other solution later!
+	func tutorialStep2() {
+		print("step 2 started")
+		self.tutorialStep2Completion = 0
+		self.label2.removeFromParent()
+		self.label3.fontColor = .black
+		self.addChild(label3)
+		delay(2.0) {
+			self.label3.removeFromParent()
+			self.label4.fontColor = .black
+			self.addChild(self.label4)
+			self.tutorialStep2Completion = 1
+		}
+	}
+	
+	func tutorialStep3() {
+		print("step 3 started")
+		self.tutorialStep3Completion = 0
+		self.label4.removeFromParent()
+		self.label5.fontColor = .black
+		self.addChild(label5)
+		delay(2.0) {
+			self.label5.removeFromParent()
+			self.label6.fontColor = .black
+			self.addChild(self.label6)
+			self.tutorialStep3Completion = 1
+		}
+	}
+	
 	func introAnimation() {
-		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 800, height: 800))
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
 		shaderTest.setupProperties(pos: CGPoint(x: 0, y: 0))
 		self.addChild(shaderTest)
 	}
@@ -139,9 +193,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
     func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
-		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
+		
+		//this is bad but...
+		if(tutorialStep1Completion == 1 && tutorialStep2Completion == -1) {
+			tutorialStep2()
+		}
+		if(tutorialStep2Completion == 1 && tutorialStep3Completion == -1) {
+			tutorialStep3()
+		}
+		
+		/*let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 		shaderTest.setupProperties(pos: pos)
-		self.addChild(shaderTest)
+		self.addChild(shaderTest)*/
     }
     
     func touchMoved(toPoint pos : CGPoint) {
@@ -220,25 +283,25 @@ public class InkBlob: SKShapeNode{
 		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		
 		//this is awful pls fix
-		var speedFactor = 2.0
+		var speedFactor = 1.0
 		let timer : Timer?
 		timer =  Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true, block: { (Timer) in
 			speedFactor += 0.02
 			updatingVariable += Float(0.016666667 * speedFactor)
 			shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		})
-		delay(1.0) {
+		delay(2.0) {
 			timer?.invalidate()
 			
 			let timer2 : Timer?
 			timer2 =  Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true, block: { (Timer) in
 				speedFactor -= 0.019
 				print(speedFactor)
-				updatingVariable += Float(0.016666667 * speedFactor)
+				updatingVariable -= Float(0.016666667 * speedFactor)
 				shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 			})
 			
-			delay(1.0) {
+			delay(4.0) {
 				timer2?.invalidate()
 			}
 		}
