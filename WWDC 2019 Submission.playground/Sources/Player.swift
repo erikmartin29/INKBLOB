@@ -16,8 +16,6 @@ enum GameState {
 	case playing
 }
 
-let shader = SKShader(fileNamed: "inkBlobShader.fsh")
-
 public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var gameState: GameState = .part1
 	var stateLocked = false
@@ -313,22 +311,16 @@ public class InkBlob: SKShapeNode{
 		self.strokeColor = .clear
 		self.position = pos
 		self.zPosition = -1
-		
+		let shader = SKShader(fileNamed: "inkBlobShader.fsh")
 		self.fillShader = shader
 		
 		//TODO: smooth animation curves
-		var updatingVariable: Float = 0
-		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
-		
-		//this is awful pls fix
-		 
 		let action = SKAction.customAction(withDuration: 8.0) { (node, time) in
-			//"real time" 1.0
-			//"shader time" function(1.0) -> 1.2
 			print(time)
 			shader.uniforms =  [SKUniform(name: "TEST", float: Float(time))]
 		}
 		
+		//this doesn't seem to change the animation curve:
 		action.timingMode = .easeInEaseOut
 		self.run(action)
 		
