@@ -62,12 +62,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.physicsWorld.contactDelegate = self
 		
 		//self.introAnimation()
-		//self.loadLevel(self.levelsArray[0])
+		self.loadLevel(self.levelsArray[0])
 		startTutorial()
 		
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
 		self.thePlayer.physicsBody?.restitution = 0.0
+		self.thePlayer.physicsBody?.allowsRotation = false
 		self.thePlayer.physicsBody?.categoryBitMask = playerCategory
 		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
 	}
@@ -90,11 +91,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	//find other solution later!
 	func tutorialStep2() {
 		print("step 2 started")
+		self.blottingAllowed = false
 		self.tutorialStep2Completion = 0
 		self.label2.removeFromParent()
 		self.label3.fontColor = .black
 		self.addChild(label3)
 		delay(2.0) {
+			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
 			self.addChild(self.label4)
@@ -104,11 +107,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func tutorialStep3() {
 		print("step 3 started")
+		self.blottingAllowed = false
 		self.tutorialStep3Completion = 0
 		self.label4.removeFromParent()
 		self.label5.fontColor = .black
 		self.addChild(label5)
 		delay(2.0) {
+			self.blottingAllowed = true
 			self.label5.removeFromParent()
 			self.label6.fontColor = .black
 			self.addChild(self.label6)
@@ -127,15 +132,17 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		////INSERT ANIMTION HERE LATER/////
 		//add platforms
 		for index in 0..<level.platformFormation.count {
+			//access values from tuple: (Platform, CGPoint)
 			let platform = level.platformFormation[index].0
 			let platformPos = level.platformFormation[index].1
 			platform.setupProperties(pos: platformPos)
 			self.addChild(platform)
 		}
-		//add player at position
+		//add player at its start position
 		thePlayer.position = level.playerStartPosition
 		self.addChild(thePlayer)
 		
+		//add the floor
 		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
 		floor.fillColor = .white
 		floor.position = CGPoint(x: 0, y: -350)
@@ -146,6 +153,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
 		self.addChild(floor)
+		
+		//add the goal 
 		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
 		goal.fillColor = .red
 		goal.position = CGPoint(x: 300, y: 300)
@@ -158,7 +167,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(goal)
 	}
 	
-	func didBegin(_ contact: SKPhysicsContact) {
+	public func didBegin(_ contact: SKPhysicsContact) {
 		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
 		
 		touchingGround = true
@@ -177,6 +186,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				currentLevel += 1
 			} else {
 				print("WINNER!")
+				blottingAllowed = false
 				//WIN ANIMATION
 			}
 		}
@@ -198,18 +208,30 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
 		
-		//this is bad but...
-		if(tutorialStep1Completion == 1 && tutorialStep2Completion == -1) {
-		tutorialStep2()
-		}
-		if(tutorialStep2Completion == 1 && tutorialStep3Completion == -1) {
-		tutorialStep3()
-		}
+		print("\(tutorialStep1Completion)  \(tutorialStep2Completion) \(tutorialStep3Completion)")
 		
 		if(blottingAllowed) {
+			/* ADD THIS WHEN SHADERS ARE WORKING
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos)
 			self.addChild(shaderTest)
+			*/
+			
+			//this is just for testing
+			let blob = SKShapeNode(rectOf: CGSize(width: 100, height: 100))
+			blob.position = pos
+			blob.strokeColor = .black
+			blob.zPosition = -1
+			blob.fillColor = .black
+			self.addChild(blob)
+		}
+		
+		//this is bad but...
+		if(tutorialStep1Completion == 1 && tutorialStep2Completion == -1) {
+			tutorialStep2()
+		}
+		if(tutorialStep2Completion == 1 && tutorialStep3Completion == -1) {
+			tutorialStep3()
 		}
 	}
 	
