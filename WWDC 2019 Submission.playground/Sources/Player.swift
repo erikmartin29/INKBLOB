@@ -199,6 +199,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func loadLevel(_ level: Level) {
 		////INSERT ANIMTION HERE LATER/////
 		//add platforms
+		levelLoading = true
+		
 		for index in 0..<level.platformFormation.count {
 			//access values from tuple: (Platform, CGPoint)
 			let platform = level.platformFormation[index].0
@@ -256,24 +258,21 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			//print(currentLevel)
 			if(currentLevel < levelsArray.count) {
 				
-				if(!levelLoading) {
+					//remove player instantly
+					if let child = self.childNode(withName: "player") as? SKShapeNode {
+						child.removeFromParent()
+					}
+				
 					let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
 					shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
 					shaderTest.animate(amount: 5.5)
 					addChild(shaderTest)
-					
-					/*let test = SKShapeNode(rect: CGSize(width: 1200, height: 1200))
-					test.addChild(shaderTest)
-					self.addChild(test)*/
 					
 					delay(3.5) {
 						if let child = self.childNode(withName: "floor") as? SKShapeNode {
 							child.removeFromParent()
 						}
 						if let child = self.childNode(withName: "platform") as? SKShapeNode {
-							child.removeFromParent()
-						}
-						if let child = self.childNode(withName: "player") as? SKShapeNode {
 							child.removeFromParent()
 						}
 						if let child = self.childNode(withName: "normalBlob1") as? SKShapeNode {
@@ -414,7 +413,7 @@ public class InkBlob: SKShapeNode{
 	
 	func setupProperties(pos: CGPoint, inBack: Bool) {
 
-		self.fillColor = .red
+		self.fillColor = .clear
 		self.strokeColor = .clear
 		self.position = pos
 		if(inBack) {self.zPosition = -1} else {self.zPosition = 1}
