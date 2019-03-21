@@ -30,7 +30,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let label2 = SKLabelNode(text: "Click here to continue.")
 	let label3 = SKLabelNode(text: "This is your player")
 	let label4 = SKLabelNode(text: "Click here to continue.")
-	let label5 = SKLabelNode(text: "This is your goal. Get here to advance to the next level.")
+	let label5 = SKLabelNode(text: "This is your goal.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
 	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart the level.")
 	let label8 = SKLabelNode(text: "Go ahead and use your third ink blob to revel the map.")
@@ -101,12 +101,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("step 2 started")
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
-		self.label3.fontColor = .black
-		self.label3.fontSize = 45
+		label3.fontColor = .white
+		label3.fontSize = 20
+		label3.position = CGPoint(x: -250, y: -200)
 		self.addChild(label3)
 		self.gameState = .part2
 		stateLocked = true
-		delay(2.0) {
+		delay(4.0) {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
@@ -120,8 +121,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("step 3 started")
 		self.blottingAllowed = false
 		self.label4.removeFromParent()
-		self.label5.fontColor = .black
-		self.label5.fontSize = 45
+		label5.fontColor = .white
+		label5.fontSize = 20
+		label5.position = CGPoint(x: 350, y: 250)
 		self.addChild(label5)
 		self.gameState = .part3
 		stateLocked = true
