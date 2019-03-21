@@ -9,6 +9,8 @@ let goalCategory:   UInt32 = 0x1 << 2 //4
 //change debug mode to true to see things more clearly
 let debugMode = false
 var numberOfBlobs = 0
+var numberOfPlatforms = 0
+var goalCollisions = 0
 
 enum GameState {
 	case part1
@@ -53,7 +55,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//make it so that I can use those varibles ^^^
 	let levelsArray: [Level] = [
-		Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 50, height: 100)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
 		]
 	
@@ -206,7 +208,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			let platform = level.platformFormation[index].0
 			let platformPos = level.platformFormation[index].1
 			platform.setupProperties(pos: platformPos)
-			platform.name = "platform"
+			numberOfPlatforms += 1
+			platform.name = "platform\(numberOfPlatforms)"
 			self.addChild(platform)
 		}
 		//add player at its start position
@@ -258,41 +261,45 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			//print(currentLevel)
 			if(currentLevel < levelsArray.count) {
 				
-					//remove player instantly
-					if let child = self.childNode(withName: "player") as? SKShapeNode {
-						child.removeFromParent()
-					}
+			//remove player instantly
+			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
+			self.transistionAnimation()
+			delay(3.5) {
+				self.unloadLevel()
+				self.loadLevel(self.levelsArray[self.currentLevel])
+				self.currentLevel += 1
+			}
 				
-					let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
-					shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
-					shaderTest.animate(amount: 5.5)
-					addChild(shaderTest)
-					
-					delay(3.5) {
-						if let child = self.childNode(withName: "floor") as? SKShapeNode {
-							child.removeFromParent()
-						}
-						if let child = self.childNode(withName: "platform") as? SKShapeNode {
-							child.removeFromParent()
-						}
-						if let child = self.childNode(withName: "normalBlob1") as? SKShapeNode {
-							child.removeFromParent()
-						}
-						if let child = self.childNode(withName: "normalBlob2") as? SKShapeNode {
-							child.removeFromParent()
-						}
-						if let child = self.childNode(withName: "normalBlob3") as? SKShapeNode {
-							child.removeFromParent()
-						}
-						self.loadLevel(self.levelsArray[self.currentLevel])
-						self.levelLoading = false
-						self.currentLevel += 1
-					}
-				}
 			} else {
 				print("WINNER!")
+				self.transistionAnimation()
 				blottingAllowed = false
 				//WIN ANIMATION
+			}
+		}
+	}
+	
+	func transistionAnimation() {
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
+		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
+		shaderTest.animate(amount: 5.5)
+		addChild(shaderTest)
+	}
+	
+	func unloadLevel() {
+		if let child = self.childNode(withName: "floor") as? SKShapeNode {
+			child.removeFromParent()
+		}
+		
+		for i in 1...numberOfPlatforms {
+			if let child = self.childNode(withName: "platform\(i)") as? SKShapeNode {
+				child.removeFromParent()
+			}
+		}
+		
+		for i in 1...numberOfBlobs {
+			if let child = self.childNode(withName: "normalBlob\(i)") as? SKShapeNode {
+				child.removeFromParent()
 			}
 		}
 	}
