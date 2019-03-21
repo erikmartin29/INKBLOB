@@ -8,6 +8,7 @@ let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
 let debugMode = false
+var numberOfBlobs = 0
 
 enum GameState {
 	case part1
@@ -20,7 +21,7 @@ enum GameState {
 
 public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var gameState: GameState = .part1
-	var stateLocked = false
+	var stateLocked = true //state locked for both mouse and key
 	
 	//labels
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
@@ -65,9 +66,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		//self.introAnimation()
+		self.introAnimation()
 		self.loadLevel(self.levelsArray[0])
-		startTutorial()
+		//startTutorial()
 		
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
@@ -77,14 +78,15 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
 	}
 	
-	//make this better it sucks
 	func startTutorial() {
 		label1.fontColor = .black
+		label1.fontSize = 45
 		addChild(label1)
 		stateLocked = true
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
+			self.label2.fontSize = 45
 			self.addChild(self.label2)
 			self.blottingAllowed = true
 			self.stateLocked = false
@@ -98,6 +100,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
 		self.label3.fontColor = .black
+		self.label3.fontSize = 45
 		self.addChild(label3)
 		self.gameState = .part2
 		stateLocked = true
@@ -105,6 +108,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
+			self.label4.fontSize = 45
 			self.addChild(self.label4)
 			self.stateLocked = false
 		}
@@ -115,6 +119,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label4.removeFromParent()
 		self.label5.fontColor = .black
+		self.label5.fontSize = 45
 		self.addChild(label5)
 		self.gameState = .part3
 		stateLocked = true
@@ -122,6 +127,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
 			self.label6.fontColor = .black
+			self.label6.fontSize = 45
 			self.addChild(self.label6)
 			self.gameState = .part4
 			self.stateLocked = false
@@ -133,6 +139,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label6.removeFromParent()
 		self.label7.fontColor = .black
+		self.label7.fontSize = 45
 		self.addChild(label7)
 		self.gameState = .part4
 		stateLocked = true
@@ -140,6 +147,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.blottingAllowed = true
 			self.label7.removeFromParent()
 			self.label8.fontColor = .black
+			self.label8.fontSize = 45
 			self.addChild(self.label8)
 			self.gameState = .part5
 			self.stateLocked = false
@@ -151,14 +159,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label8.removeFromParent()
 		self.label9.fontColor = .black
+		self.label9.fontSize = 45
 		self.addChild(label9)
 		self.gameState = .part5
 		stateLocked = true
 		delay(2.0) {
 			self.blottingAllowed = true
 			self.label9.removeFromParent()
-			self.label8.fontColor = .black
-			self.addChild(self.label8)
 			self.gameState = .playing
 			self.stateLocked = false
 		}
@@ -175,9 +182,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func introAnimation() {
-		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
-		shaderTest.setupProperties(pos: CGPoint(x:0,y:0))
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
+		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
 		self.addChild(shaderTest)
+		shaderTest.animate(amount: 5.5)
+		delay(5.5) {
+			//18
+			self.startTutorial()
+		}
 		//animate(mode:)
 		
 		//start tutorial:
@@ -192,10 +204,12 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			let platform = level.platformFormation[index].0
 			let platformPos = level.platformFormation[index].1
 			platform.setupProperties(pos: platformPos)
+			platform.name = "platform"
 			self.addChild(platform)
 		}
 		//add player at its start position
 		thePlayer.position = level.playerStartPosition
+		thePlayer.name = "player"
 		self.addChild(thePlayer)
 		
 		//add the floor
@@ -208,6 +222,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.restitution = 0.0
 		floor.physicsBody?.categoryBitMask = groundCategory
 		floor.physicsBody?.contactTestBitMask = playerCategory
+		floor.name = "floor"
 		self.addChild(floor)
 		
 		//add the goal 
@@ -220,8 +235,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		goal.physicsBody?.isDynamic = false
 		goal.physicsBody?.categoryBitMask = goalCategory
 		goal.physicsBody?.contactTestBitMask = playerCategory
+		goal.name = "goal"
 		self.addChild(goal)
 	}
+	
+	var levelLoading = false
 	
 	public func didBegin(_ contact: SKPhysicsContact) {
 		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
@@ -235,11 +253,43 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		if collision == playerCategory | goalCategory {
 			print("collision between goal and player occured")
 			//TODO: maybe animate this?
-			self.removeAllChildren()
 			//print(currentLevel)
 			if(currentLevel < levelsArray.count) {
-				self.loadLevel(levelsArray[currentLevel])
-				currentLevel += 1
+				
+				if(!levelLoading) {
+					let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
+					shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
+					shaderTest.animate(amount: 5.5)
+					addChild(shaderTest)
+					
+					/*let test = SKShapeNode(rect: CGSize(width: 1200, height: 1200))
+					test.addChild(shaderTest)
+					self.addChild(test)*/
+					
+					delay(3.5) {
+						if let child = self.childNode(withName: "floor") as? SKShapeNode {
+							child.removeFromParent()
+						}
+						if let child = self.childNode(withName: "platform") as? SKShapeNode {
+							child.removeFromParent()
+						}
+						if let child = self.childNode(withName: "player") as? SKShapeNode {
+							child.removeFromParent()
+						}
+						if let child = self.childNode(withName: "normalBlob1") as? SKShapeNode {
+							child.removeFromParent()
+						}
+						if let child = self.childNode(withName: "normalBlob2") as? SKShapeNode {
+							child.removeFromParent()
+						}
+						if let child = self.childNode(withName: "normalBlob3") as? SKShapeNode {
+							child.removeFromParent()
+						}
+						self.loadLevel(self.levelsArray[self.currentLevel])
+						self.levelLoading = false
+						self.currentLevel += 1
+					}
+				}
 			} else {
 				print("WINNER!")
 				blottingAllowed = false
@@ -265,8 +315,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		//possibly make it so that ink bleed until mouse is released??
 		if(blottingAllowed) {
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
-			shaderTest.setupProperties(pos: pos)
+			shaderTest.setupProperties(pos: pos, inBack: true)
 			self.addChild(shaderTest)
+			shaderTest.animate(amount: 2.0)
 		}
 		
 		guard stateLocked == false else { return }
@@ -359,18 +410,28 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 
 ///INKBLOB///
 public class InkBlob: SKShapeNode{
-	func setupProperties(pos: CGPoint) {
+	let shader = SKShader(fileNamed: "inkBlobShader.fsh")
+	
+	func setupProperties(pos: CGPoint, inBack: Bool) {
+
 		self.fillColor = .red
 		self.strokeColor = .clear
 		self.position = pos
-		self.zPosition = -1
-		let shader = SKShader(fileNamed: "inkBlobShader.fsh")
+		if(inBack) {self.zPosition = -1} else {self.zPosition = 1}
+		if(inBack) {
+			numberOfBlobs += 1
+			print("normalBlob\(numberOfBlobs)")
+			self.name = "normalBlob\(numberOfBlobs)"
+		} else {self.name = "transistionBlob"}
 		self.fillShader = shader
+	}
+	
+	func animate(amount: Double) {
 		
-		let action = SKAction.customAction(withDuration: 2.0) { (node, time) in
+		let action = SKAction.customAction(withDuration: amount) { (node, time) in
 			//print(time)
 			//maybe play w/ different equations later
-			shader.uniforms =  [SKUniform(name: "TEST", float: Float((3*time) + 2))]
+			self.shader.uniforms =  [SKUniform(name: "TEST", float: Float((3*time) + 2))]
 		}
 		//set animation curve
 		action.timingMode = .easeInEaseOut

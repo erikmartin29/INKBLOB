@@ -19,7 +19,7 @@ bool DE( vec2 pp, float t )
 
 vec4 sceneColour(vec2 pp, float time )
 {
-	float endTime = 32.;
+	float endTime = 16.;
 	float rewind = 2.;
 	float t = mod(time, endTime+rewind );
 	
