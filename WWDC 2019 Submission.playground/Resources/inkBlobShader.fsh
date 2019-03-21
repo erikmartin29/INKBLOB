@@ -52,6 +52,6 @@ void main()
 	float angle = atan(x.y, x.x);
 	
 	vec4 fragColor = vec4(0.0);
-	fragColor = sceneColour(vec2(angle, -1.0 * radius) * 9.0, u_time);
+	fragColor = sceneColour(vec2(angle, -1.0 * radius) * 9.0, TEST);
 	gl_FragColor = fragColor;
 }

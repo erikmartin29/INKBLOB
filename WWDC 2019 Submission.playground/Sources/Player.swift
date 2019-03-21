@@ -213,19 +213,19 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		if(blottingAllowed) {
 			
-			/* ADD THIS WHEN SHADERS ARE WORKING
+			//ADD THIS WHEN SHADERS ARE WORKING
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos)
 			self.addChild(shaderTest)
-			*/
+
 			
 			//this is just for testing
-			let blob = SKShapeNode(rectOf: CGSize(width: 100, height: 100))
+			/*let blob = SKShapeNode(rectOf: CGSize(width: 100, height: 100))
 			blob.position = pos
 			blob.strokeColor = .black
 			blob.zPosition = -1
 			blob.fillColor = .black
-			self.addChild(blob)
+			self.addChild(blob)*/
 		}
 		
 		guard stateLocked == false else { return }
@@ -321,13 +321,23 @@ public class InkBlob: SKShapeNode{
 		shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		
 		//this is awful pls fix
+		 
+		let action = SKAction.customAction(withDuration: 8.0) { (node, time) in
+			//"real time" 1.0
+			//"shader time" function(1.0) -> 1.2
+			print(time)
+			shader.uniforms =  [SKUniform(name: "TEST", float: Float(time))]
+		}
+		
+		action.timingMode = .easeInEaseOut
+		self.run(action)
 		
 		print("starting animation")
-		var speedFactor = 1.0
+		/*var speedFactor = 1.0
 		let timer : Timer?
 		timer =  Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true, block: { (Timer) in
 			speedFactor += 0.04
-			updatingVariable += Float(0.01 * speedFactor)
+			updatingVariable += Float(0.01)
 			shader.uniforms =  [SKUniform(name: "TEST", float: updatingVariable)]
 		})
 		delay(2.0) {
@@ -347,7 +357,7 @@ public class InkBlob: SKShapeNode{
 			delay(4.0) {
 				timer2?.invalidate()
 			}
-		}
+		}*/
 	}
 }
 
