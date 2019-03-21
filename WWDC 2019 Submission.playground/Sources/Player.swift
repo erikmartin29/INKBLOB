@@ -9,17 +9,18 @@ let goalCategory:   UInt32 = 0x1 << 2 //4
 //change debug mode to true to see things more clearly
 let debugMode = false
 
+enum GameState {
+	case part1
+	case part2
+	case part3
+	case playing
+}
+
 let shader = SKShader(fileNamed: "inkBlobShader.fsh")
 
 public class GameScene: SKScene, SKPhysicsContactDelegate {
-	
-	//this works for now but find a better solution
-	//-1: incomplete, notstarted
-	//0: in progress
-	//1: complete
-	var tutorialStep1Completion = -1
-	var tutorialStep2Completion = -1
-	var tutorialStep3Completion = -1
+	var gameState: GameState = .part1
+	var stateLocked = false
 	
 	//labels
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
@@ -75,15 +76,15 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//make this better it sucks
 	func startTutorial() {
-		self.tutorialStep1Completion = 0
 		label1.fontColor = .black
 		addChild(label1)
+		stateLocked = true
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
 			self.addChild(self.label2)
 			self.blottingAllowed = true
-			self.tutorialStep1Completion = 1
+			self.stateLocked = false
 			//TODO: add arrow
 		}
 	}
@@ -92,32 +93,34 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func tutorialStep2() {
 		print("step 2 started")
 		self.blottingAllowed = false
-		self.tutorialStep2Completion = 0
 		self.label2.removeFromParent()
 		self.label3.fontColor = .black
 		self.addChild(label3)
+		self.gameState = .part2
+		stateLocked = true
 		delay(2.0) {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
 			self.addChild(self.label4)
-			self.tutorialStep2Completion = 1
+			self.stateLocked = false
 		}
 	}
 	
 	func tutorialStep3() {
 		print("step 3 started")
 		self.blottingAllowed = false
-		self.tutorialStep3Completion = 0
 		self.label4.removeFromParent()
 		self.label5.fontColor = .black
 		self.addChild(label5)
+		self.gameState = .part3
+		stateLocked = true
 		delay(2.0) {
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
 			self.label6.fontColor = .black
 			self.addChild(self.label6)
-			self.tutorialStep3Completion = 1
+			self.gameState = .playing
 		}
 	}
 	
@@ -208,9 +211,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
 		
-		print("\(tutorialStep1Completion)  \(tutorialStep2Completion) \(tutorialStep3Completion)")
-		
 		if(blottingAllowed) {
+			
 			/* ADD THIS WHEN SHADERS ARE WORKING
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos)
@@ -226,13 +228,21 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(blob)
 		}
 		
-		//this is bad but...
-		if(tutorialStep1Completion == 1 && tutorialStep2Completion == -1) {
-			tutorialStep2()
+		guard stateLocked == false else { return }
+
+		switch gameState {
+			case .part1:
+				tutorialStep2()
+			case .part2:
+				tutorialStep3()
+			case .part3:
+				//something here
+				print("Part 3")
+			case .playing:
+				//do game stuff in here
+				print("playing")
 		}
-		if(tutorialStep2Completion == 1 && tutorialStep3Completion == -1) {
-			tutorialStep3()
-		}
+		
 	}
 	
 	func touchMoved(toPoint pos : CGPoint) {
