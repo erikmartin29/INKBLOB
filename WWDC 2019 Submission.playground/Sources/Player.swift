@@ -24,6 +24,8 @@ enum GameState {
 public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var gameState: GameState = .part1
 	var stateLocked = true //state locked for both mouse and key
+	var keyInteractionEnabled   = false
+	var mouseInteractionEnabled = false
 	
 	//labels
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
@@ -46,7 +48,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var touchingGround = false
 	
 	let thePlayer: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 20, height: 20))
-	
 	///level loading///
 	//TODO: parse this data in a file (maybe JSON?)
 	//let levelsArray: [Level] = []
@@ -78,6 +79,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.thePlayer.physicsBody?.allowsRotation = false
 		self.thePlayer.physicsBody?.categoryBitMask = playerCategory
 		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
+		
+		//make sure the player cannot go outside of the screen
+		let xRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.width/2)
+		let yRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.height/2)
+		//sprite.constraints = [SKConstraint.positionX(xRange,Y:yRange)] // iOS 9
+		thePlayer.constraints = [SKConstraint.positionX(xRange,y:yRange)]
+
 	}
 	
 	func startTutorial() {
@@ -92,6 +100,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(self.label2)
 			self.blottingAllowed = true
 			self.stateLocked = false
+			self.mouseInteractionEnabled = true
 			//TODO: add arrow
 		}
 	}
@@ -107,6 +116,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label3)
 		self.gameState = .part2
 		stateLocked = true
+		self.mouseInteractionEnabled = false
 		delay(4.0) {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
@@ -114,6 +124,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label4.fontSize = 45
 			self.addChild(self.label4)
 			self.stateLocked = false
+			self.mouseInteractionEnabled = true
 		}
 	}
 	
@@ -127,6 +138,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label5)
 		self.gameState = .part3
 		stateLocked = true
+		self.mouseInteractionEnabled = false
 		delay(2.0) {
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
@@ -135,6 +147,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(self.label6)
 			self.gameState = .part4
 			self.stateLocked = false
+			self.keyInteractionEnabled = true
+			self.mouseInteractionEnabled = false
 		}
 	}
 	
@@ -147,6 +161,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label7)
 		self.gameState = .part4
 		stateLocked = true
+		self.keyInteractionEnabled = false
 		delay(2.0) {
 			self.blottingAllowed = true
 			self.label7.removeFromParent()
@@ -155,6 +170,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(self.label8)
 			self.gameState = .part5
 			self.stateLocked = false
+			self.mouseInteractionEnabled = true
 		}
 	}
 	
@@ -167,11 +183,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label9)
 		self.gameState = .part5
 		stateLocked = true
+		self.mouseInteractionEnabled = false
 		delay(2.0) {
 			self.blottingAllowed = true
 			self.label9.removeFromParent()
 			self.gameState = .playing
 			self.stateLocked = false
+			self.mouseInteractionEnabled = true
 		}
 	}
 	
@@ -321,14 +339,12 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
-		if(blottingAllowed) {
-			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
-			shaderTest.setupProperties(pos: pos, inBack: true)
-			self.addChild(shaderTest)
-			shaderTest.animate(amount: 2.0)
-		}
+		guard mouseInteractionEnabled == true else { return }
 		
-		guard stateLocked == false else { return }
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
+		shaderTest.setupProperties(pos: pos, inBack: true)
+		self.addChild(shaderTest)
+		shaderTest.animate(amount: 2.0)
 
 		switch gameState {
 			case .part1:
@@ -449,7 +465,6 @@ public class InkBlob: SKShapeNode{
 
 ///PLATFORM///
 public class Platform: SKShapeNode {
-	
 	func setupProperties(pos: CGPoint) {
 		if(debugMode) {self.fillColor = .red}
 		else {self.fillColor = .white}
