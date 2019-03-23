@@ -31,7 +31,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var currentLevel = 1
 	
 	//labels
-	
 	let titleLabel = SKLabelNode(text: "INKBLOB")
 	
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
@@ -39,10 +38,12 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let label3 = SKLabelNode(text: "This is your player")
 	let label4 = SKLabelNode(text: "Click here to continue.")
 	let label5 = SKLabelNode(text: "This is your goal.")
+	let label5Line2 = SKLabelNode(text: "Get your player here to advance to the next level.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
 	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart the level.")
-	let label8 = SKLabelNode(text: "Go ahead and use your third ink blob to revael the map.")
-	let label9 = SKLabelNode(text: "GOOD LUCK")
+	let label8 = SKLabelNode(text: "Click here to continue")
+	let label9 = SKLabelNode(text: "As you can see, using ink reveals the map.")
+	let label9Line2 = SKLabelNode(text: "You have 3 ink blobs per level. Use them wisely")
 	
 	var blottingAllowed = false
 	
@@ -67,7 +68,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		]
 	
 	public override func didMove(to view: SKView) {
-		
 		//set the bg to white if we aren't debugging
 		if(!debugMode) {self.backgroundColor = .white}
 		
@@ -75,7 +75,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.introAnimation()
 		self.loadLevel(self.levelsArray[0])
-		//startTutorial()
 		
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
@@ -87,7 +86,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		//make sure the player cannot go outside of the screen
 		let xRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.width/2)
 		let yRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.height/2)
-		//sprite.constraints = [SKConstraint.positionX(xRange,Y:yRange)] // iOS 9
 		thePlayer.constraints = [SKConstraint.positionX(xRange,y:yRange)]
 
 	}
@@ -95,7 +93,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func introAnimation() {
 		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
 		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
-		self.addChild(shaderTest)
+		addChild(shaderTest)
 		shaderTest.animate(amount: 5.5)
 		titleLabel.fontSize = 50
 		titleLabel.fontColor = .white
@@ -157,12 +155,17 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		label5.fontSize = 20
 		label5.position = CGPoint(x: 300, y: 250)
 		self.addChild(label5)
+		label5Line2.fontColor = .white
+		label5Line2.fontSize = 20
+		label5Line2.position = CGPoint(x: 300, y: 225)
+		self.addChild(label5Line2)
 		self.gameState = .part3
 		stateLocked = true
 		self.mouseInteractionEnabled = false
 		delay(4.0) {
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
+			self.label5Line2.removeFromParent()
 			self.label6.fontColor = .white
 			self.label6.fontSize = 20
 			self.label6.position = CGPoint(x: -350, y: -200)
@@ -182,15 +185,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		delay(2.0) {
 		self.label6.removeFromParent()
-		self.label7.fontColor = .black
-		self.label7.fontSize = 45
-		self.addChild(self.label7)
-		}
-		delay(4.0) {
 			self.blottingAllowed = true
 			self.label7.removeFromParent()
 			self.label8.fontColor = .black
-			self.label8.fontSize = 45
+			self.label8.fontSize = 20
+			self.label8.position = CGPoint(x: 150, y: -100)
 			self.addChild(self.label8)
 			self.gameState = .part5
 			self.stateLocked = false
@@ -202,18 +201,28 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("step 5 started")
 		self.blottingAllowed = false
 		self.label8.removeFromParent()
-		self.label9.fontColor = .black
-		self.label9.fontSize = 45
+		self.label9.fontColor = .white
+		self.label9.fontSize = 20
+		self.label9.position = CGPoint(x: 150, y: -100)
+		self.label9Line2.fontColor = .white
+		self.label9Line2.fontSize = 20
+		self.label9Line2.position = CGPoint(x: 150, y: -75)
 		self.addChild(label9)
+		self.addChild(label9Line2)
 		self.gameState = .part5
 		stateLocked = true
 		self.mouseInteractionEnabled = false
-		delay(2.0) {
+		delay(4.0) {
+			self.label9.text = "Good luck! See you on the other end :)"
+			self.label9Line2.text = "If you mess up, press R to restart the level."
+			delay(4.0) {
 			self.blottingAllowed = true
 			self.label9.removeFromParent()
+			self.label9Line2.removeFromParent()
 			self.gameState = .playing
 			self.stateLocked = false
 			self.mouseInteractionEnabled = true
+			}
 		}
 	}
 	
