@@ -17,6 +17,10 @@ enum GameState {
 	case part3
 	case part4
 	case part5
+	case part6
+	case part7
+	case part8
+	case part9
 	case playing
 }
 
@@ -26,6 +30,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	var keyInteractionEnabled   = false
 	var mouseInteractionEnabled = false
+	
+	var spaceClicked = false
 	
 	//labels
 	let titleLabel = SKLabelNode(text: "INKBLOB")
@@ -59,13 +65,19 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	///level loading///
 	//TODO: parse this data in a file (maybe JSON?)
 	//let levelsArray: [Level] = []
-	let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: -350, y: 50))
-	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))
+	/*let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 0, y: -200)),
+										  (Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x:300, y: -50)),
+										  (Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
+										  (Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))],
+							  			  playerStartPos: CGPoint(x: -350, y: 50))
+	
+	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))*/
 	
 	//make it so that I can use those varibles ^^^
 	let levelsArray: [Level] = [
-		Level(formation: [(Platform(rectOf: CGSize(width: 50, height: 100)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -350, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 0, y: -200))],  playerStartPos: CGPoint(x: -350, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 400, height: 50)),CGPoint(x: 0, y: -250))], playerStartPos: CGPoint(x: 100, y: 50)),
 		]
 	
 	public override func didMove(to view: SKView) {
@@ -102,23 +114,29 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		addChild(titleLabel)
 		delay(5.5) {
 			self.titleLabel.removeFromParent()
-			self.startTutorial()
+			self.step1() //self.startTutorial()
 		}
 	}
 	
-	func startTutorial() {
+	////TUTORIAL STEPS//////
+	
+	//start -> click to continue
+	func step1() {
+		print("step 1 started")
+		self.gameState = .part1
+		
+		//intro label thing
 		label1.fontColor = .black
 		label1.fontSize = 45
 		addChild(label1)
+		
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
 			self.label2.fontSize = 30
 			self.label2.position = CGPoint(x: -350, y: -200)
-			
 			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -250))
 			self.addChild(self.clickIndicator)
-			
 			self.addChild(self.label2)
 			self.blottingAllowed = true
 			self.mouseInteractionEnabled = true
@@ -126,127 +144,154 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 	}
 	
-	func tutorialStep2() {
+	//this is ur player -> wait until space pressed
+	func step2() {
 		print("step 2 started")
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
 		self.label3.fontColor = .white
-		self.label3.fontSize = 30
+		self.label3.fontSize = 25
 		self.label3.position = CGPoint(x: -350, y: -200)
 		self.addChild(label3)
 		self.gameState = .part2
-		self.mouseInteractionEnabled = false
+		self.keyInteractionEnabled = true
 		
-		delay(0.5) {
-			self.clickIndicator.removeFromParent()
-		}
-		delay(4.0) {
-			self.blottingAllowed = true
-			self.label3.removeFromParent()
-			self.label4.fontColor = .black
-			self.label4.fontSize = 30
-			self.label4.position = CGPoint(x: 300, y: 250)
-			
-			self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 330))
-			self.addChild(self.clickIndicator)
-			
-			self.addChild(self.label4)
-			self.mouseInteractionEnabled = true
-		}
+		self.clickIndicator.removeFromParent()
+		//self.mouseInteractionEnabled = false
+		//self.keyInteractionEnabled = true
+		//waiting for space press
 	}
 	
-	func tutorialStep3() {
+	//space pressed -> click to continue
+	func step3() {
 		print("step 3 started")
-		self.blottingAllowed = false
+		self.gameState = .part3
+		
+		self.label3.removeFromParent()
+		
+		
+		self.label4.fontColor = .black
+		self.label4.fontSize = 25
+		self.label4.position = CGPoint(x: 300, y: 250)
+		self.addChild(label4)
+		
+		self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 330))
+		self.addChild(self.clickIndicator)
+		
+	}
+	
+	//this is your goal -> space to continue
+	func step4() {
+		print("step 4 started")
+		self.gameState = .part4
+		
 		self.label4.removeFromParent()
+		
 		self.label5.fontColor = .white
-		self.label5.fontSize = 30
+		self.label5.fontSize = 25
 		self.label5.position = CGPoint(x: 300, y: 250)
 		self.label5Line2.fontColor = .white
-		self.label5Line2.fontSize = 30
+		self.label5Line2.fontSize = 25
 		self.label5Line2.position = CGPoint(x: 300, y: 225)
 		self.addChild(label5)
 		self.addChild(label5Line2)
-		self.gameState = .part3
-		self.mouseInteractionEnabled = false
-		delay(0.5) {
-			self.clickIndicator.removeFromParent()
-		}
-		delay(4.0) {
-			self.keyInteractionEnabled = true
-			self.blottingAllowed = true
-			self.label5.removeFromParent()
-			self.label5Line2.removeFromParent()
-			self.label6.fontColor = .white
-			self.label6.fontSize = 30
-			self.label6.position = CGPoint(x: -350, y: -200)
-			self.addChild(self.label6)
-			self.gameState = .part4
-			self.mouseInteractionEnabled = false
-		}
+		
+		self.clickIndicator.removeFromParent()
+		//add "this is your goal " label
+		
+		
 	}
 	
-	func tutorialStep4() {
-		print("step 4 started")
-		self.gameState = .part5
-		self.blottingAllowed = false
-		delay(2.0) {
-			self.label6.removeFromParent()
-			self.blottingAllowed = true
-			self.label7.removeFromParent()
-			self.label8.fontColor = .black
-			self.label8.fontSize = 30
-			self.label8.position = CGPoint(x: 150, y: -100)
-			
-			self.clickIndicator.setupProperties(pos: CGPoint(x: 150, y: -20))
-			self.addChild(self.clickIndicator)
-			
-			self.addChild(self.label8)
-			self.gameState = .part5
-			self.mouseInteractionEnabled = true
-		}
-	}
-	
-	func tutorialStep5() {
+	func step5() {
 		print("step 5 started")
-		self.blottingAllowed = false
+		self.gameState = .part5
+		
+		self.label5.removeFromParent()
+		self.label5Line2.removeFromParent()
+		
+		//add "use arrow keys to move" label
+		self.label6.fontColor = .white
+		self.label6.fontSize = 25
+		self.label6.position = CGPoint(x: -350, y: -200)
+		self.addChild(self.label6)
+
+	}
+	
+	func step6() {
+		print("step 6 started")
+		self.gameState = .part6
+		
+		self.label6.removeFromParent()
+		
+		self.label8.fontColor = .black
+		self.label8.fontSize = 25
+		self.label8.position = CGPoint(x: 150, y: -100)
+		self.addChild(label8)
+		
+		//click here indicator
+		self.clickIndicator.setupProperties(pos: CGPoint(x: 150, y: -20))
+		self.addChild(self.clickIndicator)
+		
+	}
+	
+	func step7() {
+		print("step 7 started")
+		self.gameState = .part7
+		
+		self.clickIndicator.removeFromParent()
 		self.label8.removeFromParent()
+		
 		self.label9.fontColor = .white
-		self.label9.fontSize = 30
+		self.label9.fontSize = 25
 		self.label9.position = CGPoint(x: 150, y: -100)
 		self.label9Line2.fontColor = .white
-		self.label9Line2.fontSize = 30
+		self.label9Line2.fontSize = 25
 		self.label9Line2.position = CGPoint(x: 150, y: -75)
 		self.addChild(label9)
 		self.addChild(label9Line2)
-		self.gameState = .part5
-		self.mouseInteractionEnabled = false
-		//delay(0.5) {
-			self.clickIndicator.removeFromParent()
-		//}
-		delay(4.0) {
-			self.label9.text = "Good luck! See you on the other end :)"
-			self.label9Line2.text = "If you mess up, press R to restart the level."
-			delay(4.0) {
-			self.blottingAllowed = true
-			self.label9.removeFromParent()
-			self.label9Line2.removeFromParent()
-			self.gameState = .playing
-			self.mouseInteractionEnabled = true
+		
+		//ink explain label #1
+		
+	}
+	
+	func step8() {
+		print("step 8 started")
+		self.gameState = .part8
+		
+		//self.label9.removeFromParent()
+		//self.label9Line2.removeFromParent()
+		label9.text = "Good luck! Press space to start the first level."
+		label9Line2.text = "If you mess up, press R to restart a level."
+		//ink explain label #1
+		
+	}
+	
+	func step9() {
+		print("step 9 started")
+		self.gameState = .playing
+		
+		self.label9Line2.removeFromParent()
+		self.label9.removeFromParent()
+		
+		currentLevel += 1
+		
+		if(currentLevel <= levelsArray.count) {
+			//remove player instantly
+			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
+			self.transistionAnimation()
+			
+			//unload level and load next level
+			delay(3.5) {
+				self.unloadLevel()
+				self.loadLevel(self.levelsArray[self.currentLevel - 1])
 			}
 		}
 	}
-	
-	func tutorialPlaying() {
-		print("PLAYING IS CALLED YEET")
-		self.blottingAllowed = false
-		self.label8.removeFromParent()
-		delay(2.0) {
-			self.blottingAllowed = true
-		}
-	}
-	
+
 	func loadLevel(_ level: Level) {
+		
+		print("LOADING LEVEL \(level.playerStartPosition)")
+		
 		//add platforms
 		for index in 0..<level.platformFormation.count {
 			//access values from tuple: (Platform, CGPoint)
@@ -286,32 +331,41 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		goal.physicsBody?.contactTestBitMask = playerCategory
 		goal.name = "goal"
 		self.addChild(goal)
+		
+		//print("FINISHED LOADING LEVEL")
+		
+		levelLoading = false
 	}
+	
+	var levelLoading = false
 	
 	public func didBegin(_ contact: SKPhysicsContact) {
 		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
-		
-		//fix this. this isn't always true
 		
 		if collision == playerCategory | groundCategory {
 			touchingGround = true
 			//print("collision between ground and player occured")
 		}
 		
-		if collision == playerCategory | goalCategory {
+		if collision == playerCategory | goalCategory && !levelLoading {
 			//print("collision between goal and player occured")
 			//TODO: maybe animate this?
+			
+			//remove player instantly
+			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
+			
 			if(currentLevel < levelsArray.count) {
-				//remove player instantly
-				if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
 				self.transistionAnimation()
+				levelLoading = true
 				
 				//unload level and load next level
 				delay(3.5) {
 					self.unloadLevel()
-					self.loadLevel(self.levelsArray[self.currentLevel])
 					self.currentLevel += 1
+					print("trying to load lvel \(self.currentLevel - 1)")
+					self.loadLevel(self.levelsArray[self.currentLevel - 1])
 				}
+				
 			} else {
 				print("WINNER!")
 				self.transistionAnimation()
@@ -329,6 +383,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func unloadLevel() {
+		
+		//print("UNLOADING LEVEL")
+		
 		if let child = self.childNode(withName: "floor") as? SKShapeNode {
 			child.removeFromParent()
 		}
@@ -344,6 +401,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				child.removeFromParent()
 			}
 		}
+		
+		//print("UNLOAD SUCCESSFUL")
 	}
 	
 	
@@ -375,17 +434,19 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				shaderTest.animate(amount: 1.8)
 				switch gameState {
 					case .part1:
-						tutorialStep2()
+						step2()
 					case .part2:
-						tutorialStep3()
+						step3()
 					case .part3:
-						break
+						step4()
 					case .part4:
-						break
+						step5()
 					case .part5:
-						tutorialStep5()
-					case .playing:
-						tutorialPlaying()
+						step6()
+					case .part6:
+						step7()
+					default:
+						break
 				}
 			}
 		}
@@ -397,12 +458,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(shaderTest)
 			shaderTest.animate(amount: 1.8)
 		}
-		
-		/*let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
-		shaderTest.setupProperties(pos: pos, inBack: true)
-		self.addChild(shaderTest)
-		shaderTest.animate(amount: 1.8)*/
-		
 	}
 	
 	func touchMoved(toPoint pos : CGPoint) {
@@ -428,9 +483,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	///////////////////
 	
 	public override func keyDown(with event: NSEvent) {
-		
 		guard keyInteractionEnabled == true else { return }
-		
 		switch Int(event.keyCode) {
 			case kVK_LeftArrow:
 				leftPressed = true
@@ -438,13 +491,29 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				rightPressed = true
 			case kVK_UpArrow:
 				upPressed = true
+			case kVK_Space:
+				spaceClicked = true
+				switch gameState {
+				case .part2:
+					step3()
+				case .part4:
+					step5()
+				case .part7:
+					step8()
+				case .part8:
+					step9()
+				default:
+					break
+				}
 			default:
 				break
 		}
 		
-		if(gameState == .part4) {
-			self.tutorialStep4()
+		//something onther than sapce
+		if(gameState == .part5 && !spaceClicked) {
+			step6()
 		}
+
 	}
 	
 	public override func keyUp(with event: NSEvent) {
@@ -455,6 +524,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			rightPressed = false
 		case kVK_UpArrow:
 			upPressed = false
+		case kVK_Space:
+			spaceClicked = false
 		default:
 			break
 		}
@@ -479,7 +550,7 @@ public func delay(_ delay: Double, closure: @escaping ()->()) {
 
 class ClickIndicator: SKShapeNode {
 	func setupProperties(pos: CGPoint) {
-		print("CALLED YES YSE")
+		//print("CALLED YES YSE")
 		self.position = pos
 		self.fillColor = .clear
 		self.strokeColor = .black
