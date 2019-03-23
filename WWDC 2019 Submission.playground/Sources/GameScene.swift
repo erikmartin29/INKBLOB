@@ -31,6 +31,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var keyInteractionEnabled   = false
 	var arrowKeyControlsEnabled = false
 	var mouseInteractionEnabled = false
+	var spaceInteractionEnabled = false
 	
 	var spaceClicked = false
 	
@@ -189,17 +190,25 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("step 2 started")
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
+		
 		self.label3.fontColor = .white
 		self.label3.fontSize = 40
 		self.label3.position = CGPoint(x: -300, y: -160)
+		
 		self.spaceLabel.position = CGPoint(x: label3.position.x, y: label3.position.y - 30)
 		self.addChild(spaceLabel)
+		
 		self.addChild(label3)
 		self.gameState = .part2
 		self.keyInteractionEnabled = true
-		
 		self.clickIndicator.removeFromParent()
-		//self.mouseInteractionEnabled = false
+		
+		self.mouseInteractionEnabled = false
+		self.spaceInteractionEnabled = false
+		delay(1.8) {
+			self.spaceInteractionEnabled = true
+			self.mouseInteractionEnabled = true
+		}
 		//self.keyInteractionEnabled = true
 		//waiting for space press
 	}
@@ -219,7 +228,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.clickIndicator.setupProperties(pos: CGPoint(x: 275, y: 300))
 		self.addChild(self.clickIndicator)
-		
 	}
 	
 	//this is your goal -> space to continue
@@ -237,6 +245,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label5Line2.position = CGPoint(x: 275, y: 195)
 		self.addChild(label5)
 		self.addChild(label5Line2)
+		
+		self.mouseInteractionEnabled = false
+		self.spaceInteractionEnabled = false
+		delay(1.8) {
+			self.spaceInteractionEnabled = true
+			self.mouseInteractionEnabled = true
+		}
 		
 		self.spaceLabel.position = CGPoint(x: label5Line2.position.x, y: label5Line2.position.y - 30)
 		self.addChild(spaceLabel)
@@ -303,6 +318,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.gameState = .part7
 		
 		self.clickIndicator.removeFromParent()
+		
+		self.mouseInteractionEnabled = false
+		self.spaceInteractionEnabled = false
+		delay(1.8) {
+			self.spaceInteractionEnabled = true
+			self.mouseInteractionEnabled = true
+		}
+		
 		self.label8.removeFromParent()
 		
 		self.label9.fontColor = .white
@@ -536,6 +559,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
 		guard mouseInteractionEnabled == true else { return }
+		print("CLICK WAS ALLOWED")
 		
 		let touchedNodes = self.nodes(at: pos)
 		print(touchedNodes)
@@ -610,6 +634,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				guard arrowKeyControlsEnabled == true else { return }
 				upPressed = true
 			case kVK_Space:
+				guard spaceInteractionEnabled == true else { return }
 				spaceClicked = true
 				switch gameState {
 				case .part2:
