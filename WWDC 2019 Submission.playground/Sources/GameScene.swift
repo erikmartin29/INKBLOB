@@ -36,13 +36,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//labels
 	let titleLabel = SKLabelNode(text: "INKBLOB")
+	let spaceLabel = SKLabelNode(text: "Press space to proceed")
 	
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
 	let label2 = SKLabelNode(text: "Click here to continue.")
 	let label3 = SKLabelNode(text: "This is your player")
 	let label4 = SKLabelNode(text: "Click here to continue.")
 	let label5 = SKLabelNode(text: "This is your goal.")
-	let label5Line2 = SKLabelNode(text: "Get your player here to advance to the next level.")
+	let label5Line2 = SKLabelNode(text: "Get here to advance to the next level.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
 	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart the level.")
 	let label8 = SKLabelNode(text: "Click here to continue")
@@ -62,6 +63,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let thePlayer: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 20, height: 20))
 	
 	let clickIndicator = ClickIndicator(ellipseOf: CGSize(width: 50.0, height: 50.0))
+	
 	
 	///level loading///
 	//TODO: parse this data in a file (maybe JSON?)
@@ -89,6 +91,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.introAnimation()
 		self.loadLevel(self.levelsArray[0])
+		
+		spaceLabel.fontSize = 20
 		
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
@@ -134,9 +138,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
-			self.label2.fontSize = 30
+			self.label2.fontSize = 35
 			self.label2.position = CGPoint(x: -350, y: -200)
-			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -250))
+			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -285))
 			self.addChild(self.clickIndicator)
 			self.addChild(self.label2)
 			self.blottingAllowed = true
@@ -151,8 +155,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
 		self.label3.fontColor = .white
-		self.label3.fontSize = 25
+		self.label3.fontSize = 35
 		self.label3.position = CGPoint(x: -350, y: -200)
+		self.spaceLabel.position = CGPoint(x: label3.position.x, y: label3.position.y - 30)
+		self.addChild(spaceLabel)
 		self.addChild(label3)
 		self.gameState = .part2
 		self.keyInteractionEnabled = true
@@ -169,14 +175,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.gameState = .part3
 		
 		self.label3.removeFromParent()
-		
+		self.spaceLabel.removeFromParent()
 		
 		self.label4.fontColor = .black
-		self.label4.fontSize = 25
-		self.label4.position = CGPoint(x: 300, y: 250)
+		self.label4.fontSize = 35
+		self.label4.position = CGPoint(x: 300, y: 225)
 		self.addChild(label4)
 		
-		self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 330))
+		self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 300))
 		self.addChild(self.clickIndicator)
 		
 	}
@@ -189,13 +195,16 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label4.removeFromParent()
 		
 		self.label5.fontColor = .white
-		self.label5.fontSize = 25
+		self.label5.fontSize = 35
 		self.label5.position = CGPoint(x: 300, y: 250)
 		self.label5Line2.fontColor = .white
 		self.label5Line2.fontSize = 25
 		self.label5Line2.position = CGPoint(x: 300, y: 225)
 		self.addChild(label5)
 		self.addChild(label5Line2)
+		
+		self.spaceLabel.position = CGPoint(x: label5Line2.position.x, y: label5Line2.position.y - 30)
+		self.addChild(spaceLabel)
 		
 		self.clickIndicator.removeFromParent()
 		//add "this is your goal " label
@@ -209,6 +218,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label5.removeFromParent()
 		self.label5Line2.removeFromParent()
+		self.spaceLabel.removeFromParent()
 		
 		//add "use arrow keys to move" label
 		self.label6.fontColor = .white
@@ -231,7 +241,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		self.label8.fontColor = .black
-		self.label8.fontSize = 25
+		self.label8.fontSize = 35
 		self.label8.position = CGPoint(x: 150, y: -100)
 		self.addChild(label8)
 		
@@ -313,6 +323,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		//add player at its start position
 		thePlayer.position = level.playerStartPosition
+		thePlayer.fillColor = .black
 		thePlayer.name = "player"
 		self.addChild(thePlayer)
 		
@@ -330,10 +341,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(floor)
 		
 		//add the goal 
-		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
+		let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
 		goal.position = CGPoint(x: 300, y: 300)
-		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
-		goal.fillColor = .white
+		goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
+		goal.fillColor = .black
 		goal.physicsBody?.affectedByGravity = false
 		goal.physicsBody?.isDynamic = false
 		goal.physicsBody?.categoryBitMask = goalCategory
