@@ -23,11 +23,17 @@ enum GameState {
 
 public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var gameState: GameState = .part1
+	
 	var stateLocked = true //state locked for both mouse and key
 	var keyInteractionEnabled   = false
 	var mouseInteractionEnabled = false
 	
+	var currentLevel = 1
+	
 	//labels
+	
+	let titleLabel = SKLabelNode(text: "INKBLOB")
+	
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
 	let label2 = SKLabelNode(text: "Click here to continue.")
 	let label3 = SKLabelNode(text: "This is your player")
@@ -35,7 +41,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let label5 = SKLabelNode(text: "This is your goal.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
 	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart the level.")
-	let label8 = SKLabelNode(text: "Go ahead and use your third ink blob to revel the map.")
+	let label8 = SKLabelNode(text: "Go ahead and use your third ink blob to revael the map.")
 	let label9 = SKLabelNode(text: "GOOD LUCK")
 	
 	var blottingAllowed = false
@@ -51,16 +57,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	///level loading///
 	//TODO: parse this data in a file (maybe JSON?)
 	//let levelsArray: [Level] = []
-	let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50))
+	let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: -350, y: 50))
 	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))
 	
 	//make it so that I can use those varibles ^^^
 	let levelsArray: [Level] = [
-		Level(formation: [(Platform(rectOf: CGSize(width: 50, height: 100)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 50, height: 100)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -350, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
 		]
-	
-	var currentLevel = 1
 	
 	public override func didMove(to view: SKView) {
 		
@@ -88,6 +92,21 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 
 	}
 	
+	func introAnimation() {
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
+		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
+		self.addChild(shaderTest)
+		shaderTest.animate(amount: 5.5)
+		titleLabel.fontSize = 50
+		titleLabel.fontColor = .white
+		titleLabel.zPosition = 2
+		addChild(titleLabel)
+		delay(5.5) {
+			self.titleLabel.removeFromParent()
+			self.startTutorial()
+		}
+	}
+	
 	func startTutorial() {
 		label1.fontColor = .black
 		label1.fontSize = 45
@@ -96,7 +115,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
-			self.label2.fontSize = 45
+			self.label2.fontSize = 20
+			self.label2.position = CGPoint(x: -350, y: -200)
 			self.addChild(self.label2)
 			self.blottingAllowed = true
 			self.stateLocked = false
@@ -112,7 +132,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label2.removeFromParent()
 		label3.fontColor = .white
 		label3.fontSize = 20
-		label3.position = CGPoint(x: -250, y: -200)
+		label3.position = CGPoint(x: -350, y: -200)
 		self.addChild(label3)
 		self.gameState = .part2
 		stateLocked = true
@@ -121,7 +141,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
-			self.label4.fontSize = 45
+			self.label4.fontSize = 20
+			self.label4.position = CGPoint(x: 300, y: 250)
 			self.addChild(self.label4)
 			self.stateLocked = false
 			self.mouseInteractionEnabled = true
@@ -134,16 +155,17 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label4.removeFromParent()
 		label5.fontColor = .white
 		label5.fontSize = 20
-		label5.position = CGPoint(x: 350, y: 250)
+		label5.position = CGPoint(x: 300, y: 250)
 		self.addChild(label5)
 		self.gameState = .part3
 		stateLocked = true
 		self.mouseInteractionEnabled = false
-		delay(2.0) {
+		delay(4.0) {
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
-			self.label6.fontColor = .black
-			self.label6.fontSize = 45
+			self.label6.fontColor = .white
+			self.label6.fontSize = 20
+			self.label6.position = CGPoint(x: -350, y: -200)
 			self.addChild(self.label6)
 			self.gameState = .part4
 			self.stateLocked = false
@@ -154,15 +176,17 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func tutorialStep4() {
 		print("step 4 started")
+		self.gameState = .part4
+		self.stateLocked = true
+		self.keyInteractionEnabled = false
 		self.blottingAllowed = false
+		delay(2.0) {
 		self.label6.removeFromParent()
 		self.label7.fontColor = .black
 		self.label7.fontSize = 45
-		self.addChild(label7)
-		self.gameState = .part4
-		stateLocked = true
-		self.keyInteractionEnabled = false
-		delay(2.0) {
+		self.addChild(self.label7)
+		}
+		delay(4.0) {
 			self.blottingAllowed = true
 			self.label7.removeFromParent()
 			self.label8.fontColor = .black
@@ -203,20 +227,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 	}
 	
-	func introAnimation() {
-		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
-		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
-		self.addChild(shaderTest)
-		shaderTest.animate(amount: 5.5)
-		delay(5.5) {
-			//18
-			self.startTutorial()
-		}
-		//animate(mode:)
-		
-		//start tutorial:
-	}
-	
 	//TODO: levelID is a bad param name think of a new one later
 	func loadLevel(_ level: Level) {
 		////INSERT ANIMTION HERE LATER/////
@@ -252,10 +262,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		//add the goal 
 		let goal: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 50, height: 50))
-		goal.fillColor = .red
 		goal.position = CGPoint(x: 300, y: 300)
 		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
 		goal.fillColor = .white
+		//goal.strokeColor = .white
 		goal.physicsBody?.affectedByGravity = false
 		goal.physicsBody?.isDynamic = false
 		goal.physicsBody?.categoryBitMask = goalCategory
@@ -278,7 +288,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		if collision == playerCategory | goalCategory {
 			print("collision between goal and player occured")
 			//TODO: maybe animate this?
-			//print(currentLevel)
 			if(currentLevel < levelsArray.count) {
 				
 			//remove player instantly
@@ -354,14 +363,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			case .part3:
 				break
 			case .part4:
-				print("they added the blob yo")
-				//tutor
+				break
 			case .part5:
 				tutorialStep5()
 			case .playing:
-				//do game stuff in here
 				tutorialPlaying()
-				print("playing")
 		}
 		
 	}
@@ -403,7 +409,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		//print("PLEASE PLEASE \(gameState)")
 		guard stateLocked == false else { return }
 		if(gameState == .part4) {
-			tutorialStep4()
+			self.tutorialStep4()
 		}
 	}
 	
