@@ -429,32 +429,68 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			//remove player instantly
 			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
 			
-			if(currentLevel < levelsArray.count) {
+			currentLevel += 1
+			
+			if(currentLevel <= levelsArray.count) {
+				//remove player instantly
 				self.transistionAnimation()
-				levelLoading = true
 				
 				//unload level and load next level
 				delay(3.5) {
+					self.arrowKeyControlsEnabled = true
+					if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
 					self.unloadLevel()
-					self.currentLevel += 1
-					print("trying to load lvel \(self.currentLevel - 1)")
 					self.loadLevel(self.levelsArray[self.currentLevel - 1])
 				}
-				
 			} else {
 				print("WINNER!")
-				self.transistionAnimation()
+				self.winnerAnimation()
 				blottingAllowed = false
 				//WIN ANIMATION
 			}
 		}
 	}
 	
+	let title = SKLabelNode(text: "LEVEL X")
+	
 	func transistionAnimation() {
 		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
 		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
 		shaderTest.animate(amount: 5.5)
 		addChild(shaderTest)
+
+		title.text = "LEVEL \(currentLevel - 1)"
+		title.fontSize = 50
+		title.setScale(0.0)
+		title.fontColor = .white
+		title.zPosition = 2
+		
+		let zoom = SKAction.scale(to: 1.5, duration: 3.5)
+		zoom.timingMode = .easeOut
+		addChild(title)
+		title.run(zoom)
+		
+		delay(5.5) { self.title.removeFromParent() }
+	}
+	
+	func winnerAnimation() {
+		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
+		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
+		shaderTest.animate(amount: 3.5)
+		addChild(shaderTest)
+		
+		title.text = "YOU WON"
+		title.fontSize = 50
+		title.setScale(0.0)
+		title.fontColor = .white
+		title.zPosition = 2
+		
+		let zoom = SKAction.scale(to: 1.5, duration: 3.5)
+		zoom.timingMode = .easeOut
+		addChild(title)
+		title.run(zoom)
+		
+		//delay(5.5) { self.title.removeFromParent() }
 	}
 	
 	func unloadLevel() {
@@ -475,6 +511,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			if let child = self.childNode(withName: "normalBlob\(i)") as? SKShapeNode {
 				child.removeFromParent()
 			}
+		}
+		
+		if let child = self.childNode(withName: "goal") as? SKShapeNode {
+			child.removeFromParent()
 		}
 		
 		//print("UNLOAD SUCCESSFUL")
