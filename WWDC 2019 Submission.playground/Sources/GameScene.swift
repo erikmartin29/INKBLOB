@@ -39,19 +39,17 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let titleLabel = SKLabelNode(text: "INKBLOB")
 	let spaceLabel = SKLabelNode(text: "Press space to proceed")
 	let goodLuck = SKLabelNode(text: "Good Luck!")
-	
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
 	let label2 = SKLabelNode(text: "Click here to continue.")
 	let label3 = SKLabelNode(text: "This is your player")
 	let label4 = SKLabelNode(text: "Click here to continue.")
 	let label5 = SKLabelNode(text: "This is your goal.")
-	let label5Line2 = SKLabelNode(text: "Get here to advance to the next level.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
 	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart")
 	let label8 = SKLabelNode(text: "Click here to continue")
 	let label9 = SKLabelNode(text: "As you can see, using ink reveals the map.")
 	let label9Line2 = SKLabelNode(text: "You have 3 ink blobs per level. Use them wisely")
-	
+	let label5Line2 = SKLabelNode(text: "Get here to advance to the next level.")
 	
 	var blottingAllowed = false
 	
@@ -119,6 +117,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		
 		spaceLabel.fontSize = 28
+		spaceLabel.fontName = "AvenirNext-Bold"
 		
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
@@ -132,15 +131,18 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		let yRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.height/2)
 		thePlayer.constraints = [SKConstraint.positionX(xRange,y:yRange)]
 		
-		label1.fontName = "AvenirNext-Bold"
-		label2.fontName = "AvenirNext-Bold"
-		label3.fontName = "AvenirNext-Bold"
-		label4.fontName = "AvenirNext-Bold"
-		label5.fontName = "AvenirNext-Bold"
-		label6.fontName = "AvenirNext-Bold"
-		label7.fontName = "AvenirNext-Bold"
-		label8.fontName = "AvenirNext-Bold"
-		label9.fontName = "AvenirNext-Bold"
+		label1.fontName = "AvenirNext-Heavy"
+		label2.fontName = "AvenirNext-Heavy"
+		label3.fontName = "AvenirNext-Heavy"
+		label4.fontName = "AvenirNext-Heavy"
+		label5.fontName = "AvenirNext-Heavy"
+		label6.fontName = "AvenirNext-Heavy"
+		label7.fontName = "AvenirNext-Heavy"
+		label8.fontName = "AvenirNext-Heavy"
+		label9.fontName = "AvenirNext-Heavy"
+		
+		label5Line2.fontName = "AvenirNext-DemiBold"
+		label9Line2.fontName = "AvenirNext-DemiBold"
 
 	}
 	
@@ -286,9 +288,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		let sequence = SKAction.sequence([goRight, goLeft, goBack, jump])
 		thePlayer.run(sequence)
 		
-		delay(2.5) { self.step6() }
-		
-		self.arrowKeyControlsEnabled = true
+		delay(2.5) {
+			self.step6()
+			self.arrowKeyControlsEnabled = true
+		}
 
 	}
 	
@@ -570,7 +573,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 				shaderTest.setupProperties(pos: pos, inBack: true)
 				self.addChild(shaderTest)
-				shaderTest.animate(amount: 1.8)
+				shaderTest.animate(amount: 1.9)
 				switch gameState {
 					case .part1:
 						step2()
@@ -595,7 +598,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos, inBack: true)
 			self.addChild(shaderTest)
-			shaderTest.animate(amount: 1.8)
+			shaderTest.animate(amount: 1.5)
 		}
 	}
 	
