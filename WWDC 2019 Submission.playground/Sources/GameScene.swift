@@ -78,7 +78,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//make it so that I can use those varibles ^^^
 	let levelsArray: [Level] = [
-		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 0, y: -200))],  playerStartPos: CGPoint(x: -350, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -350, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 400, height: 50)),CGPoint(x: 0, y: -250))], playerStartPos: CGPoint(x: 100, y: 50)),
 		]
@@ -90,7 +90,30 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.physicsWorld.contactDelegate = self
 		
 		self.introAnimation()
-		self.loadLevel(self.levelsArray[0])
+		levelLoading = true
+		self.loadLevel(self.levelsArray[self.currentLevel - 1])
+		
+		//unload level and load next level
+		delay(3.0) {
+			//add player at its start position
+			self.thePlayer.position = self.levelsArray[self.currentLevel - 1].playerStartPosition
+			self.thePlayer.fillColor = .black
+			self.thePlayer.name = "player"
+			self.addChild(self.thePlayer)
+			
+			//add the goal
+			let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
+			goal.position = CGPoint(x: 300, y: 300)
+			goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
+			goal.fillColor = .black
+			goal.physicsBody?.affectedByGravity = false
+			goal.physicsBody?.isDynamic = false
+			goal.physicsBody?.categoryBitMask = goalCategory
+			goal.physicsBody?.contactTestBitMask = playerCategory
+			goal.name = "goal"
+			self.addChild(goal)
+		}
+		
 		
 		spaceLabel.fontSize = 20
 		
@@ -105,6 +128,16 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		let xRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.width/2)
 		let yRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.height/2)
 		thePlayer.constraints = [SKConstraint.positionX(xRange,y:yRange)]
+		
+		label1.fontName = "AvenirNext-Bold"
+		label2.fontName = "AvenirNext-Bold"
+		label3.fontName = "AvenirNext-Bold"
+		label4.fontName = "AvenirNext-Bold"
+		label5.fontName = "AvenirNext-Bold"
+		label6.fontName = "AvenirNext-Bold"
+		label7.fontName = "AvenirNext-Bold"
+		label8.fontName = "AvenirNext-Bold"
+		label9.fontName = "AvenirNext-Bold"
 
 	}
 	
@@ -139,7 +172,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
 			self.label2.fontSize = 35
-			self.label2.position = CGPoint(x: -350, y: -200)
+			self.label2.position = CGPoint(x: -275, y: -160)
 			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -285))
 			self.addChild(self.clickIndicator)
 			self.addChild(self.label2)
@@ -199,7 +232,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label5.position = CGPoint(x: 300, y: 250)
 		self.label5Line2.fontColor = .white
 		self.label5Line2.fontSize = 25
-		self.label5Line2.position = CGPoint(x: 300, y: 225)
+		self.label5Line2.position = CGPoint(x: 300, y: 210)
 		self.addChild(label5)
 		self.addChild(label5Line2)
 		
@@ -222,7 +255,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		//add "use arrow keys to move" label
 		self.label6.fontColor = .white
-		self.label6.fontSize = 25
+		self.label6.fontSize = 20
 		self.label6.position = CGPoint(x: -350, y: -200)
 		self.addChild(self.label6)
 		
@@ -260,10 +293,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label9.fontColor = .white
 		self.label9.fontSize = 25
-		self.label9.position = CGPoint(x: 150, y: -100)
+		self.label9.position = CGPoint(x: 150, y: -20)
 		self.label9Line2.fontColor = .white
 		self.label9Line2.fontSize = 25
-		self.label9Line2.position = CGPoint(x: 150, y: -75)
+		self.label9Line2.position = CGPoint(x: 150, y: -50)
 		self.addChild(label9)
 		self.addChild(label9Line2)
 		
@@ -294,13 +327,12 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		if(currentLevel <= levelsArray.count) {
 			//remove player instantly
-			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
 			self.transistionAnimation()
 			
 			//unload level and load next level
 			delay(3.5) {
 				self.arrowKeyControlsEnabled = true
-				
+				if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
 				self.unloadLevel()
 				self.loadLevel(self.levelsArray[self.currentLevel - 1])
 			}
@@ -321,11 +353,26 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			platform.name = "platform\(numberOfPlatforms)"
 			self.addChild(platform)
 		}
-		//add player at its start position
-		thePlayer.position = level.playerStartPosition
-		thePlayer.fillColor = .black
-		thePlayer.name = "player"
-		self.addChild(thePlayer)
+		
+		if(currentLevel > 1) {
+			//add player at its start position
+			thePlayer.position = level.playerStartPosition
+			thePlayer.fillColor = .black
+			thePlayer.name = "player"
+			self.addChild(thePlayer)
+			
+			//add the goal
+			let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
+			goal.position = CGPoint(x: 300, y: 300)
+			goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
+			goal.fillColor = .black
+			goal.physicsBody?.affectedByGravity = false
+			goal.physicsBody?.isDynamic = false
+			goal.physicsBody?.categoryBitMask = goalCategory
+			goal.physicsBody?.contactTestBitMask = playerCategory
+			goal.name = "goal"
+			self.addChild(goal)
+		}
 		
 		//add the floor
 		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
@@ -339,18 +386,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.physicsBody?.contactTestBitMask = playerCategory
 		floor.name = "floor"
 		self.addChild(floor)
-		
-		//add the goal 
-		let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
-		goal.position = CGPoint(x: 300, y: 300)
-		goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
-		goal.fillColor = .black
-		goal.physicsBody?.affectedByGravity = false
-		goal.physicsBody?.isDynamic = false
-		goal.physicsBody?.categoryBitMask = goalCategory
-		goal.physicsBody?.contactTestBitMask = playerCategory
-		goal.name = "goal"
-		self.addChild(goal)
 		
 		//print("FINISHED LOADING LEVEL")
 		
