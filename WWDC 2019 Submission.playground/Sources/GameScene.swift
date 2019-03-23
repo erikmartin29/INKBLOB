@@ -10,7 +10,6 @@ let goalCategory:   UInt32 = 0x1 << 2 //4
 let debugMode = false
 var numberOfBlobs = 0
 var numberOfPlatforms = 0
-var goalCollisions = 0
 
 enum GameState {
 	case part1
@@ -23,12 +22,10 @@ enum GameState {
 
 public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var gameState: GameState = .part1
+	var currentLevel = 1
 	
-	var stateLocked = true //state locked for both mouse and key
 	var keyInteractionEnabled   = false
 	var mouseInteractionEnabled = false
-	
-	var currentLevel = 1
 	
 	//labels
 	let titleLabel = SKLabelNode(text: "INKBLOB")
@@ -47,6 +44,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	var blottingAllowed = false
 	
+	//key press statuses
 	var leftPressed = false
 	var rightPressed = false
 	var upPressed = false
@@ -55,6 +53,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var touchingGround = false
 	
 	let thePlayer: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 20, height: 20))
+	
 	///level loading///
 	//TODO: parse this data in a file (maybe JSON?)
 	//let levelsArray: [Level] = []
@@ -109,7 +108,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		label1.fontColor = .black
 		label1.fontSize = 45
 		addChild(label1)
-		stateLocked = true
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
@@ -117,23 +115,20 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label2.position = CGPoint(x: -350, y: -200)
 			self.addChild(self.label2)
 			self.blottingAllowed = true
-			self.stateLocked = false
 			self.mouseInteractionEnabled = true
 			//TODO: add arrow
 		}
 	}
 	
-	//find other solution later!
 	func tutorialStep2() {
 		print("step 2 started")
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
-		label3.fontColor = .white
-		label3.fontSize = 20
-		label3.position = CGPoint(x: -350, y: -200)
+		self.label3.fontColor = .white
+		self.label3.fontSize = 20
+		self.label3.position = CGPoint(x: -350, y: -200)
 		self.addChild(label3)
 		self.gameState = .part2
-		stateLocked = true
 		self.mouseInteractionEnabled = false
 		delay(4.0) {
 			self.blottingAllowed = true
@@ -142,7 +137,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label4.fontSize = 20
 			self.label4.position = CGPoint(x: 300, y: 250)
 			self.addChild(self.label4)
-			self.stateLocked = false
 			self.mouseInteractionEnabled = true
 		}
 	}
@@ -151,18 +145,18 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("step 3 started")
 		self.blottingAllowed = false
 		self.label4.removeFromParent()
-		label5.fontColor = .white
-		label5.fontSize = 20
-		label5.position = CGPoint(x: 300, y: 250)
+		self.label5.fontColor = .white
+		self.label5.fontSize = 20
+		self.label5.position = CGPoint(x: 300, y: 250)
+		self.label5Line2.fontColor = .white
+		self.label5Line2.fontSize = 20
+		self.label5Line2.position = CGPoint(x: 300, y: 225)
 		self.addChild(label5)
-		label5Line2.fontColor = .white
-		label5Line2.fontSize = 20
-		label5Line2.position = CGPoint(x: 300, y: 225)
 		self.addChild(label5Line2)
 		self.gameState = .part3
-		stateLocked = true
 		self.mouseInteractionEnabled = false
 		delay(4.0) {
+			self.keyInteractionEnabled = true
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
 			self.label5Line2.removeFromParent()
@@ -171,20 +165,16 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label6.position = CGPoint(x: -350, y: -200)
 			self.addChild(self.label6)
 			self.gameState = .part4
-			self.stateLocked = false
-			self.keyInteractionEnabled = true
 			self.mouseInteractionEnabled = false
 		}
 	}
 	
 	func tutorialStep4() {
 		print("step 4 started")
-		self.gameState = .part4
-		self.stateLocked = true
-		self.keyInteractionEnabled = false
+		self.gameState = .part5
 		self.blottingAllowed = false
 		delay(2.0) {
-		self.label6.removeFromParent()
+			self.label6.removeFromParent()
 			self.blottingAllowed = true
 			self.label7.removeFromParent()
 			self.label8.fontColor = .black
@@ -192,7 +182,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label8.position = CGPoint(x: 150, y: -100)
 			self.addChild(self.label8)
 			self.gameState = .part5
-			self.stateLocked = false
 			self.mouseInteractionEnabled = true
 		}
 	}
@@ -210,7 +199,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label9)
 		self.addChild(label9Line2)
 		self.gameState = .part5
-		stateLocked = true
 		self.mouseInteractionEnabled = false
 		delay(4.0) {
 			self.label9.text = "Good luck! See you on the other end :)"
@@ -220,7 +208,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label9.removeFromParent()
 			self.label9Line2.removeFromParent()
 			self.gameState = .playing
-			self.stateLocked = false
 			self.mouseInteractionEnabled = true
 			}
 		}
@@ -230,18 +217,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("PLAYING IS CALLED YEET")
 		self.blottingAllowed = false
 		self.label8.removeFromParent()
-		stateLocked = true
 		delay(2.0) {
 			self.blottingAllowed = true
 		}
 	}
 	
-	//TODO: levelID is a bad param name think of a new one later
 	func loadLevel(_ level: Level) {
-		////INSERT ANIMTION HERE LATER/////
 		//add platforms
-		levelLoading = true
-		
 		for index in 0..<level.platformFormation.count {
 			//access values from tuple: (Platform, CGPoint)
 			let platform = level.platformFormation[index].0
@@ -274,7 +256,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		goal.position = CGPoint(x: 300, y: 300)
 		goal.physicsBody = SKPhysicsBody(rectangleOf: goal.frame.size)
 		goal.fillColor = .white
-		//goal.strokeColor = .white
 		goal.physicsBody?.affectedByGravity = false
 		goal.physicsBody?.isDynamic = false
 		goal.physicsBody?.categoryBitMask = goalCategory
@@ -283,31 +264,30 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(goal)
 	}
 	
-	var levelLoading = false
-	
 	public func didBegin(_ contact: SKPhysicsContact) {
 		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
 		
-		touchingGround = true
+		//fix this. this isn't always true
 		
 		if collision == playerCategory | groundCategory {
-			print("collision between ground and player occured")
+			touchingGround = true
+			//print("collision between ground and player occured")
 		}
 		
 		if collision == playerCategory | goalCategory {
-			print("collision between goal and player occured")
+			//print("collision between goal and player occured")
 			//TODO: maybe animate this?
 			if(currentLevel < levelsArray.count) {
+				//remove player instantly
+				if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
+				self.transistionAnimation()
 				
-			//remove player instantly
-			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
-			self.transistionAnimation()
-			delay(3.5) {
-				self.unloadLevel()
-				self.loadLevel(self.levelsArray[self.currentLevel])
-				self.currentLevel += 1
-			}
-				
+				//unload level and load next level
+				delay(3.5) {
+					self.unloadLevel()
+					self.loadLevel(self.levelsArray[self.currentLevel])
+					self.currentLevel += 1
+				}
 			} else {
 				print("WINNER!")
 				self.transistionAnimation()
@@ -404,19 +384,20 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	///////////////////
 	
 	public override func keyDown(with event: NSEvent) {
+		
+		guard keyInteractionEnabled == true else { return }
+		
 		switch Int(event.keyCode) {
-		case kVK_LeftArrow:
-			leftPressed = true
-		case kVK_RightArrow:
-			rightPressed = true
-		case kVK_UpArrow:
-			upPressed = true
-		default:
-			break
+			case kVK_LeftArrow:
+				leftPressed = true
+			case kVK_RightArrow:
+				rightPressed = true
+			case kVK_UpArrow:
+				upPressed = true
+			default:
+				break
 		}
 		
-		//print("PLEASE PLEASE \(gameState)")
-		guard stateLocked == false else { return }
 		if(gameState == .part4) {
 			self.tutorialStep4()
 		}
@@ -436,7 +417,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	public override func update(_ currentTime: TimeInterval) {
-		
 		// Called before each frame is rendered
 		if leftPressed  { thePlayer.position.x -= 10 }
 		if rightPressed { thePlayer.position.x += 10 }
@@ -444,63 +424,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 			touchingGround = false
 		}
-	}
-}
-
-///INKBLOB///
-public class InkBlob: SKShapeNode{
-	let shader = SKShader(fileNamed: "inkBlobShader.fsh")
-	
-	func setupProperties(pos: CGPoint, inBack: Bool) {
-
-		self.fillColor = .clear
-		self.strokeColor = .clear
-		self.position = pos
-		if(inBack) {self.zPosition = -1} else {self.zPosition = 1}
-		if(inBack) {
-			numberOfBlobs += 1
-			print("normalBlob\(numberOfBlobs)")
-			self.name = "normalBlob\(numberOfBlobs)"
-		} else {self.name = "transistionBlob"}
-		self.fillShader = shader
-	}
-	
-	func animate(amount: Double) {
-		
-		let action = SKAction.customAction(withDuration: amount) { (node, time) in
-			//print(time)
-			//maybe play w/ different equations later
-			self.shader.uniforms =  [SKUniform(name: "TEST", float: Float((3*time) + 2))]
-		}
-		//set animation curve
-		action.timingMode = .easeInEaseOut
-		self.run(action)
-	}
-}
-
-///PLATFORM///
-public class Platform: SKShapeNode {
-	func setupProperties(pos: CGPoint) {
-		if(debugMode) {self.fillColor = .red}
-		else {self.fillColor = .white}
-		self.position = pos
-		self.physicsBody = SKPhysicsBody(rectangleOf: self.frame.size)
-		self.physicsBody?.affectedByGravity = false
-		self.physicsBody?.isDynamic = false
-		self.physicsBody?.restitution = 0.0
-		self.physicsBody?.categoryBitMask = groundCategory
-		self.physicsBody?.contactTestBitMask = playerCategory
-	}
-}
-
-//levels will be something like this:
-class Level {
-	var platformFormation: [(Platform,CGPoint)]
-	var playerStartPosition: CGPoint
-	
-	init(formation: [(Platform,CGPoint)], playerStartPos: CGPoint) {
-		platformFormation = formation
-		playerStartPosition = playerStartPos
 	}
 }
 
