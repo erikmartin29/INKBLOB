@@ -113,7 +113,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		delay(2.0) {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
-			self.label2.fontSize = 20
+			self.label2.fontSize = 30
 			self.label2.position = CGPoint(x: -350, y: -200)
 			
 			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -250))
@@ -131,7 +131,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
 		self.label3.fontColor = .white
-		self.label3.fontSize = 20
+		self.label3.fontSize = 30
 		self.label3.position = CGPoint(x: -350, y: -200)
 		self.addChild(label3)
 		self.gameState = .part2
@@ -144,10 +144,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
-			self.label4.fontSize = 20
+			self.label4.fontSize = 30
 			self.label4.position = CGPoint(x: 300, y: 250)
 			
-			self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 380))
+			self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 330))
 			self.addChild(self.clickIndicator)
 			
 			self.addChild(self.label4)
@@ -160,22 +160,25 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label4.removeFromParent()
 		self.label5.fontColor = .white
-		self.label5.fontSize = 20
+		self.label5.fontSize = 30
 		self.label5.position = CGPoint(x: 300, y: 250)
 		self.label5Line2.fontColor = .white
-		self.label5Line2.fontSize = 20
+		self.label5Line2.fontSize = 30
 		self.label5Line2.position = CGPoint(x: 300, y: 225)
 		self.addChild(label5)
 		self.addChild(label5Line2)
 		self.gameState = .part3
 		self.mouseInteractionEnabled = false
+		delay(0.5) {
+			self.clickIndicator.removeFromParent()
+		}
 		delay(4.0) {
 			self.keyInteractionEnabled = true
 			self.blottingAllowed = true
 			self.label5.removeFromParent()
 			self.label5Line2.removeFromParent()
 			self.label6.fontColor = .white
-			self.label6.fontSize = 20
+			self.label6.fontSize = 30
 			self.label6.position = CGPoint(x: -350, y: -200)
 			self.addChild(self.label6)
 			self.gameState = .part4
@@ -192,8 +195,12 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.blottingAllowed = true
 			self.label7.removeFromParent()
 			self.label8.fontColor = .black
-			self.label8.fontSize = 20
+			self.label8.fontSize = 30
 			self.label8.position = CGPoint(x: 150, y: -100)
+			
+			self.clickIndicator.setupProperties(pos: CGPoint(x: 150, y: -20))
+			self.addChild(self.clickIndicator)
+			
 			self.addChild(self.label8)
 			self.gameState = .part5
 			self.mouseInteractionEnabled = true
@@ -205,15 +212,18 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label8.removeFromParent()
 		self.label9.fontColor = .white
-		self.label9.fontSize = 20
+		self.label9.fontSize = 30
 		self.label9.position = CGPoint(x: 150, y: -100)
 		self.label9Line2.fontColor = .white
-		self.label9Line2.fontSize = 20
+		self.label9Line2.fontSize = 30
 		self.label9Line2.position = CGPoint(x: 150, y: -75)
 		self.addChild(label9)
 		self.addChild(label9Line2)
 		self.gameState = .part5
 		self.mouseInteractionEnabled = false
+		//delay(0.5) {
+			self.clickIndicator.removeFromParent()
+		//}
 		delay(4.0) {
 			self.label9.text = "Good luck! See you on the other end :)"
 			self.label9Line2.text = "If you mess up, press R to restart the level."
@@ -353,25 +363,45 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		//possibly make it so that ink bleed until mouse is released??
 		guard mouseInteractionEnabled == true else { return }
 		
-		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
+		let touchedNodes = self.nodes(at: pos)
+		print(touchedNodes)
+		
+		//make sure that extra blobs aren't created during the tutorial scene
+		for i in 0..<touchedNodes.count {
+			if touchedNodes[i].name == "clickIndicator" {
+				let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
+				shaderTest.setupProperties(pos: pos, inBack: true)
+				self.addChild(shaderTest)
+				shaderTest.animate(amount: 1.8)
+				switch gameState {
+					case .part1:
+						tutorialStep2()
+					case .part2:
+						tutorialStep3()
+					case .part3:
+						break
+					case .part4:
+						break
+					case .part5:
+						tutorialStep5()
+					case .playing:
+						tutorialPlaying()
+				}
+			}
+		}
+		
+		//this is how blobs can be added after the tutorial scene
+		if(gameState == .playing) {
+			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
+			shaderTest.setupProperties(pos: pos, inBack: true)
+			self.addChild(shaderTest)
+			shaderTest.animate(amount: 1.8)
+		}
+		
+		/*let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 		shaderTest.setupProperties(pos: pos, inBack: true)
 		self.addChild(shaderTest)
-		shaderTest.animate(amount: 1.8)
-
-		switch gameState {
-			case .part1:
-				tutorialStep2()
-			case .part2:
-				tutorialStep3()
-			case .part3:
-				break
-			case .part4:
-				break
-			case .part5:
-				tutorialStep5()
-			case .playing:
-				tutorialPlaying()
-		}
+		shaderTest.animate(amount: 1.8)*/
 		
 	}
 	
@@ -453,6 +483,9 @@ class ClickIndicator: SKShapeNode {
 		self.position = pos
 		self.fillColor = .clear
 		self.strokeColor = .black
+		self.lineWidth = 0.5
+		self.isAntialiased = false
+		self.name = "clickIndicator"
 		
 		let action = SKAction.scale(to: 1.5, duration: 1.0)
 		action.timingMode = .easeInEaseOut
