@@ -8,7 +8,7 @@ let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
 let debugMode = false
-var numberOfBlobs = 0
+public var numberOfBlobs = 0
 var numberOfPlatforms = 0
 
 enum GameState {
@@ -37,6 +37,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	//labels
 	let titleLabel = SKLabelNode(text: "INKBLOB")
 	let spaceLabel = SKLabelNode(text: "Press space to proceed")
+	let goodLuck = SKLabelNode(text: "Good Luck!")
 	
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
 	let label2 = SKLabelNode(text: "Click here to continue.")
@@ -45,10 +46,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let label5 = SKLabelNode(text: "This is your goal.")
 	let label5Line2 = SKLabelNode(text: "Get here to advance to the next level.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
-	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart the level.")
+	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart")
 	let label8 = SKLabelNode(text: "Click here to continue")
 	let label9 = SKLabelNode(text: "As you can see, using ink reveals the map.")
 	let label9Line2 = SKLabelNode(text: "You have 3 ink blobs per level. Use them wisely")
+	
 	
 	var blottingAllowed = false
 	
@@ -78,7 +80,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//make it so that I can use those varibles ^^^
 	let levelsArray: [Level] = [
-		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -350, y: 50)),
+		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
 		Level(formation: [(Platform(rectOf: CGSize(width: 400, height: 50)),CGPoint(x: 0, y: -250))], playerStartPos: CGPoint(x: 100, y: 50)),
 		]
@@ -103,7 +105,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			//add the goal
 			let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
-			goal.position = CGPoint(x: 300, y: 300)
+			goal.position = CGPoint(x: 275, y: 300)
 			goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
 			goal.fillColor = .black
 			goal.physicsBody?.affectedByGravity = false
@@ -115,7 +117,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		
-		spaceLabel.fontSize = 20
+		spaceLabel.fontSize = 28
 		
 		self.thePlayer.physicsBody = SKPhysicsBody.init(rectangleOf: self.thePlayer.frame.size)
 		self.thePlayer.physicsBody?.affectedByGravity = true
@@ -173,7 +175,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label2.fontColor = .black
 			self.label2.fontSize = 35
 			self.label2.position = CGPoint(x: -275, y: -160)
-			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -285))
+			self.clickIndicator.setupProperties(pos: CGPoint(x: -300, y: -285))
 			self.addChild(self.clickIndicator)
 			self.addChild(self.label2)
 			self.blottingAllowed = true
@@ -188,8 +190,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.blottingAllowed = false
 		self.label2.removeFromParent()
 		self.label3.fontColor = .white
-		self.label3.fontSize = 35
-		self.label3.position = CGPoint(x: -350, y: -200)
+		self.label3.fontSize = 40
+		self.label3.position = CGPoint(x: -300, y: -160)
 		self.spaceLabel.position = CGPoint(x: label3.position.x, y: label3.position.y - 30)
 		self.addChild(spaceLabel)
 		self.addChild(label3)
@@ -211,11 +213,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.spaceLabel.removeFromParent()
 		
 		self.label4.fontColor = .black
-		self.label4.fontSize = 35
-		self.label4.position = CGPoint(x: 300, y: 225)
+		self.label4.fontSize = 40
+		self.label4.position = CGPoint(x: 290, y: 225)
 		self.addChild(label4)
 		
-		self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 300))
+		self.clickIndicator.setupProperties(pos: CGPoint(x: 275, y: 300))
 		self.addChild(self.clickIndicator)
 		
 	}
@@ -228,11 +230,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label4.removeFromParent()
 		
 		self.label5.fontColor = .white
-		self.label5.fontSize = 35
-		self.label5.position = CGPoint(x: 300, y: 250)
+		self.label5.fontSize = 40
+		self.label5.position = CGPoint(x: 275, y: 225)
 		self.label5Line2.fontColor = .white
-		self.label5Line2.fontSize = 25
-		self.label5Line2.position = CGPoint(x: 300, y: 210)
+		self.label5Line2.fontSize = 30
+		self.label5Line2.position = CGPoint(x: 275, y: 195)
 		self.addChild(label5)
 		self.addChild(label5Line2)
 		
@@ -255,9 +257,21 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		//add "use arrow keys to move" label
 		self.label6.fontColor = .white
-		self.label6.fontSize = 20
-		self.label6.position = CGPoint(x: -350, y: -200)
+		self.label6.fontSize = 28
+		self.label6.position = CGPoint(x: -290, y: -200)
 		self.addChild(self.label6)
+		
+		//animation
+		let goRight = SKAction.moveTo(x: self.thePlayer.position.x + 100, duration: 0.5)
+		let goLeft = SKAction.moveTo(x: self.thePlayer.position.x - 100, duration: 0.5)
+		let goBack = SKAction.moveTo(x: self.thePlayer.position.x, duration: 0.5)
+		let jump = SKAction.run {
+			self.thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
+		}
+		let sequence = SKAction.sequence([goRight, goLeft, goBack, jump])
+		thePlayer.run(sequence)
+		
+		delay(2.5) { self.step6() }
 		
 		self.arrowKeyControlsEnabled = true
 
@@ -269,9 +283,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label6.removeFromParent()
 		
-		delay(2.0) {
+		/*delay(2.0) {
 		self.arrowKeyControlsEnabled = false
-		}
+		}*/
 		
 		self.label8.fontColor = .black
 		self.label8.fontSize = 35
@@ -300,6 +314,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label9)
 		self.addChild(label9Line2)
 		
+		self.spaceLabel.position = CGPoint(x: label9Line2.position.x, y: label9Line2.position.y - 30)
+		self.addChild(spaceLabel)
+		
 		//ink explain label #1
 		
 	}
@@ -307,13 +324,15 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func step8() {
 		print("step 8 started")
 		self.gameState = .part8
-		
-		//self.label9.removeFromParent()
-		//self.label9Line2.removeFromParent()
-		label9.text = "Good luck! Press space to start the first level."
+	
+		self.spaceLabel.removeFromParent()
+		goodLuck.fontColor = .white
+		goodLuck.fontSize = 40
+		goodLuck.fontName = "AvenirNext-Bold"
+		goodLuck.position = CGPoint(x: 150, y: 25)
+		addChild(goodLuck)
+		label9.text = "Press space to start the first level."
 		label9Line2.text = "If you mess up, press R to restart a level."
-		//ink explain label #1
-		
 	}
 	
 	func step9() {
@@ -322,6 +341,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label9Line2.removeFromParent()
 		self.label9.removeFromParent()
+		self.goodLuck.removeFromParent()
 		
 		currentLevel += 1
 		
