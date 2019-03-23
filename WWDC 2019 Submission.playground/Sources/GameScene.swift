@@ -29,6 +29,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var currentLevel = 1
 	
 	var keyInteractionEnabled   = false
+	var arrowKeyControlsEnabled = false
 	var mouseInteractionEnabled = false
 	
 	var spaceClicked = false
@@ -214,6 +215,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label6.fontSize = 25
 		self.label6.position = CGPoint(x: -350, y: -200)
 		self.addChild(self.label6)
+		
+		self.arrowKeyControlsEnabled = true
 
 	}
 	
@@ -222,6 +225,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.gameState = .part6
 		
 		self.label6.removeFromParent()
+		
+		delay(2.0) {
+		self.arrowKeyControlsEnabled = false
+		}
 		
 		self.label8.fontColor = .black
 		self.label8.fontSize = 25
@@ -282,6 +289,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			//unload level and load next level
 			delay(3.5) {
+				self.arrowKeyControlsEnabled = true
+				
 				self.unloadLevel()
 				self.loadLevel(self.levelsArray[self.currentLevel - 1])
 			}
@@ -486,10 +495,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		guard keyInteractionEnabled == true else { return }
 		switch Int(event.keyCode) {
 			case kVK_LeftArrow:
+				guard arrowKeyControlsEnabled == true else { return }
 				leftPressed = true
 			case kVK_RightArrow:
+				guard arrowKeyControlsEnabled == true else { return }
 				rightPressed = true
 			case kVK_UpArrow:
+				guard arrowKeyControlsEnabled == true else { return }
 				upPressed = true
 			case kVK_Space:
 				spaceClicked = true
