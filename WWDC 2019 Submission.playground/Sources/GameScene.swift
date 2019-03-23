@@ -54,6 +54,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	let thePlayer: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 20, height: 20))
 	
+	let clickIndicator = ClickIndicator(ellipseOf: CGSize(width: 50.0, height: 50.0))
+	
 	///level loading///
 	//TODO: parse this data in a file (maybe JSON?)
 	//let levelsArray: [Level] = []
@@ -113,6 +115,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label2.fontColor = .black
 			self.label2.fontSize = 20
 			self.label2.position = CGPoint(x: -350, y: -200)
+			
+			self.clickIndicator.setupProperties(pos: CGPoint(x: -350, y: -250))
+			self.addChild(self.clickIndicator)
+			
 			self.addChild(self.label2)
 			self.blottingAllowed = true
 			self.mouseInteractionEnabled = true
@@ -130,12 +136,20 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(label3)
 		self.gameState = .part2
 		self.mouseInteractionEnabled = false
+		
+		delay(0.5) {
+			self.clickIndicator.removeFromParent()
+		}
 		delay(4.0) {
 			self.blottingAllowed = true
 			self.label3.removeFromParent()
 			self.label4.fontColor = .black
 			self.label4.fontSize = 20
 			self.label4.position = CGPoint(x: 300, y: 250)
+			
+			self.clickIndicator.setupProperties(pos: CGPoint(x: 300, y: 380))
+			self.addChild(self.clickIndicator)
+			
 			self.addChild(self.label4)
 			self.mouseInteractionEnabled = true
 		}
@@ -342,7 +356,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 		shaderTest.setupProperties(pos: pos, inBack: true)
 		self.addChild(shaderTest)
-		shaderTest.animate(amount: 2.0)
+		shaderTest.animate(amount: 1.8)
 
 		switch gameState {
 			case .part1:
@@ -431,4 +445,23 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 public func delay(_ delay: Double, closure: @escaping ()->()) {
 	let when = DispatchTime.now() + delay
 	DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
+}
+
+class ClickIndicator: SKShapeNode {
+	func setupProperties(pos: CGPoint) {
+		print("CALLED YES YSE")
+		self.position = pos
+		self.fillColor = .clear
+		self.strokeColor = .black
+		
+		let action = SKAction.scale(to: 1.5, duration: 1.0)
+		action.timingMode = .easeInEaseOut
+		
+		let action2 = SKAction.scale(to: 1.0, duration: 1.0)
+		action.timingMode = .easeInEaseOut
+		
+		let sequence = SKAction.sequence([action, action2])
+		let continuous = SKAction.repeatForever(sequence)
+		self.run(continuous)
+	}
 }
