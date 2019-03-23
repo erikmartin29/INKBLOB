@@ -7,7 +7,11 @@ let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
-let debugMode = false
+let debugMode = true
+
+let levelTesting = 1
+public let blobSize = 1.5
+
 public var numberOfBlobs = 0
 var numberOfPlatforms = 0
 
@@ -78,11 +82,28 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))*/
 	
 	//make it so that I can use those varibles ^^^
-	let levelsArray: [Level] = [
-		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50)),
-		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))], playerStartPos: CGPoint(x: 50, y: 50)),
-		Level(formation: [(Platform(rectOf: CGSize(width: 400, height: 50)),CGPoint(x: 0, y: -250))], playerStartPos: CGPoint(x: 100, y: 50)),
-		]
+	let levelsArray: [Level] =
+	[
+		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50), goalPos: CGPoint(x: 275, y: 300)),
+        /*Level 1:*/
+		Level(formation: [  (Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: -30, y:  -150)),
+							(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 210, y: -30)),
+							(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: 150)),
+							(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 280, y: 280)),
+						],
+			  
+						playerStartPos: CGPoint(x: 50, y: 50),
+						goalPos: CGPoint(x: 440, y: 440)),
+		/*Level 2:*/
+		Level(formation: [  (Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
+							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
+							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
+							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
+							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))],
+			  
+			  				playerStartPos: CGPoint(x: 50, y: 50),
+							goalPos: CGPoint(x: 440, y: 440))
+	]
 	
 	public override func didMove(to view: SKView) {
 		//set the bg to white if we aren't debugging
@@ -90,7 +111,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		self.introAnimation()
+		/*self.introAnimation()
 		levelLoading = true
 		self.loadLevel(self.levelsArray[self.currentLevel - 1])
 		
@@ -113,7 +134,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			goal.physicsBody?.contactTestBitMask = playerCategory
 			goal.name = "goal"
 			self.addChild(goal)
-		}
+		} */
+		
+		//SKIP TUTORIAL
+		step9()
 		
 		
 		spaceLabel.fontSize = 28
@@ -369,6 +393,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9.removeFromParent()
 		self.goodLuck.removeFromParent()
 		
+		self.mouseInteractionEnabled = true
+		self.arrowKeyControlsEnabled = true
+		self.keyInteractionEnabled = true
+		
 		currentLevel += 1
 		
 		if(currentLevel <= levelsArray.count) {
@@ -379,8 +407,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			delay(3.5) {
 				self.arrowKeyControlsEnabled = true
 				if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
-				self.unloadLevel()
-				self.loadLevel(self.levelsArray[self.currentLevel - 1])
+				//self.unloadLevel()
+				var levelToLoad = self.currentLevel
+				if(debugMode) {
+					levelToLoad = levelTesting + 1
+				}
+				
+				self.loadLevel(self.levelsArray[levelToLoad - 1])
 			}
 		}
 	}
@@ -409,8 +442,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			//add the goal
 			let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
-			goal.position = CGPoint(x: 300, y: 300)
-			goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
+			goal.position = CGPoint(x: level.goalPosition.x, y: level.goalPosition.x - 50)
+			goal.physicsBody? = SKPhysicsBody.init(circleOfRadius: 25)
 			goal.fillColor = .black
 			goal.physicsBody?.affectedByGravity = false
 			goal.physicsBody?.isDynamic = false
@@ -595,10 +628,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		//this is how blobs can be added after the tutorial scene
 		if(gameState == .playing) {
+			print("test")
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos, inBack: true)
 			self.addChild(shaderTest)
-			shaderTest.animate(amount: 1.5)
+			shaderTest.animate(amount: blobSize)
 		}
 	}
 	
