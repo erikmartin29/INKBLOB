@@ -24,7 +24,6 @@ enum GameState {
 	case part6
 	case part7
 	case part8
-	case part9
 	case playing
 }
 
@@ -443,13 +442,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 	}
 	
-	func step9() {
-	}
-	
 	func loadLevel(_ level: Level) {
-		
-		//print("LOADING LEVEL \(level.playerStartPosition)")
-		
 		//add platforms
 		for index in 0..<level.platformFormation.count {
 			//access values from tuple: (Platform, CGPoint)
@@ -678,8 +671,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 						step5()
 					case .part7:
 						step8()
-					case .part8:
-						step9()
 					default:
 						break
 				}
