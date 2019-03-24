@@ -211,6 +211,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	////TUTORIAL STEPS//////
 	
+	let whiteArrow = SKSpriteNode(texture: SKTexture(imageNamed: "whiteArrow"))
+	let blackArrow = SKSpriteNode(texture: SKTexture(imageNamed: "blackArrow"))
+	
 	//start -> click to continue
 	func step1() {
 		print("step 1 started")
@@ -225,8 +228,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.label1.removeFromParent()
 			self.label2.fontColor = .black
 			self.label2.fontSize = 35
-			self.label2.position = CGPoint(x: -275, y: -160)
+			self.label2.position = CGPoint(x: -275, y: -190)
 			self.clickIndicator.setupProperties(pos: CGPoint(x: -300, y: -285))
+			
+			self.blackArrow.position = CGPoint(x: -300, y: -220)
+			self.blackArrow.setScale(0.05)
+			self.blackArrow.zRotation = 3.92699
+			self.addChild(self.blackArrow)
+			
 			self.addChild(self.clickIndicator)
 			self.addChild(self.label2)
 			self.blottingAllowed = true
@@ -239,16 +248,23 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func step2() {
 		print("step 2 started")
 		self.blottingAllowed = false
+		
 		self.label2.removeFromParent()
+		self.blackArrow.removeFromParent()
 		
 		self.label3.fontColor = .white
 		self.label3.fontSize = 40
 		self.label3.position = CGPoint(x: -300, y: -160)
+		self.addChild(label3)
 		
 		self.spaceLabel.position = CGPoint(x: label3.position.x, y: label3.position.y - 30)
 		self.addChild(spaceLabel)
 		
-		self.addChild(label3)
+		whiteArrow.position = CGPoint(x: -300, y: -220)
+		whiteArrow.setScale(0.05)
+		whiteArrow.zRotation = 3.92699
+		self.addChild(whiteArrow)
+		
 		self.gameState = .part2
 		self.keyInteractionEnabled = true
 		self.clickIndicator.removeFromParent()
@@ -270,14 +286,20 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label3.removeFromParent()
 		self.spaceLabel.removeFromParent()
+		self.whiteArrow.removeFromParent()
 		
 		self.label4.fontColor = .black
 		self.label4.fontSize = 40
-		self.label4.position = CGPoint(x: 290, y: 225)
+		self.label4.position = CGPoint(x: 290, y: 180)
 		self.addChild(label4)
 		
 		self.clickIndicator.setupProperties(pos: CGPoint(x: 275, y: 300))
 		self.addChild(self.clickIndicator)
+		
+		blackArrow.position = CGPoint(x: 275, y: 235)
+		blackArrow.setScale(0.05)
+		blackArrow.zRotation = 0.79
+		self.addChild(blackArrow)
 	}
 	
 	//this is your goal -> space to continue
@@ -286,13 +308,20 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.gameState = .part4
 		
 		self.label4.removeFromParent()
+		self.blackArrow.removeFromParent()
+		
+		whiteArrow.position = CGPoint(x: 275, y: 235)
+		whiteArrow.setScale(0.05)
+		whiteArrow.zRotation = 0.79
+		
+		self.addChild(whiteArrow)
 		
 		self.label5.fontColor = .white
 		self.label5.fontSize = 40
-		self.label5.position = CGPoint(x: 275, y: 225)
+		self.label5.position = CGPoint(x: 275, y: 180)
 		self.label5Line2.fontColor = .white
 		self.label5Line2.fontSize = 30
-		self.label5Line2.position = CGPoint(x: 275, y: 195)
+		self.label5Line2.position = CGPoint(x: 275, y: 150)
 		self.addChild(label5)
 		self.addChild(label5Line2)
 		
@@ -319,6 +348,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label5.removeFromParent()
 		self.label5Line2.removeFromParent()
 		self.spaceLabel.removeFromParent()
+		self.whiteArrow.removeFromParent()
 		
 		//add "use arrow keys to move" label
 		self.label6.fontColor = .white
@@ -388,6 +418,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label6.removeFromParent()
 		
+		blackArrow.position = CGPoint(x: 210, y: -130)
+		blackArrow.setScale(0.05)
+		blackArrow.zRotation = 0.79 + 0.785398
+		self.addChild(blackArrow)
+		
 		self.label8.fontColor = .black
 		self.label8.fontSize = 35
 		self.label8.position = CGPoint(x: 280, y: -190)
@@ -404,6 +439,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.gameState = .part7
 		
 		self.clickIndicator.removeFromParent()
+		self.blackArrow.removeFromParent()
 		
 		self.mouseInteractionEnabled = false
 		self.spaceInteractionEnabled = false
