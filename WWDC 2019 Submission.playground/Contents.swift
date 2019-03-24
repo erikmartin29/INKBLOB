@@ -1,17 +1,18 @@
 /*:
 # *INKBLOB*
-#### Welcome to my playground! It's a platformer game with a twist.
+  Welcome to my playground! It's a platformer game with a twist.
 
 
 ## How to Play:
 - Use your arrow keys to control the player
 - Navigate your player to the goal in order to advance to the next level.
+- Click anywhere to creat an ink blob.
 
 The goal of the game is to complete all of the levels while using as little ink as you can.
 
 The less ink you use, the higher your score will be; so try to only use it when you're in a pinch.
 
-### **Have Fun!** 👍
+## **Have Fun!** 👍
 */
 import PlaygroundSupport
 import SpriteKit

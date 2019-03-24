@@ -30,13 +30,13 @@ public class LevelData {
 			Level(formation:
 				[
 				   (Platform(rectOf: CGSize(width:60 , height:60 )),CGPoint(x:-450 ,y:150  )),
-				   (Platform(rectOf: CGSize(width:60 , height:60 )),CGPoint(x:-510 ,y:-30  )),
+				   (Platform(rectOf: CGSize(width:60 , height:60 )),CGPoint(x:-540 ,y:-30  )),
 				   (Platform(rectOf: CGSize(width:60 , height:60 )),CGPoint(x:-450 ,y:-150 )),
 				   (Platform(rectOf: CGSize(width:60 , height:420)),CGPoint(x:-390 ,y:-30  )),
 				   (Platform(rectOf: CGSize(width:120 ,height:60 )),CGPoint(x:-240 ,y:-230 )),
 				   (Platform(rectOf: CGSize(width:180 ,height:60 )),CGPoint(x:-150 ,y:150  )),
-				   (Platform(rectOf: CGSize(width:180 ,height:120)),CGPoint(x:30   ,y:0    )),
-				   (Platform(rectOf: CGSize(width:60 , height:300)),CGPoint(x:90   ,y: 270 )),
+				   (Platform(rectOf: CGSize(width:360 ,height:120)),CGPoint(x:0   ,y:0    )),
+				   (Platform(rectOf: CGSize(width:60 , height:300)),CGPoint(x:90   ,y: 360 )),
 				   (Platform(rectOf: CGSize(width:60 , height:240 )),CGPoint(x:210 ,y:60 )),
 				   (Platform(rectOf: CGSize(width:120 , height:60 )),CGPoint(x:300 ,y:-30 )),
 				],

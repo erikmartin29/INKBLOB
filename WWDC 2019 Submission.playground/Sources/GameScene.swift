@@ -2,18 +2,6 @@ import Foundation
 import SpriteKit
 import Carbon.HIToolbox
 
-let playerCategory: UInt32 = 0x1 << 0 //1
-let groundCategory: UInt32 = 0x1 << 1 //2
-let goalCategory:   UInt32 = 0x1 << 2 //4
-
-//change debug mode to true to see things more clearly
-let debugMode = false
-
-public var numberOfBlobs = 0
-var numberOfPlatforms = 0
-
-public var totalBlobsAdded = 0
-
 //keeps track of where we are in the game
 enum GameState {
 	case part1
@@ -145,18 +133,19 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		addChild(titleLabel)
 		delay(5.5) {
 			self.titleLabel.removeFromParent()
-			self.step1() //self.startTutorial()
+			self.step1()
 		}
 	}
 	
-	////TUTORIAL STEPS//////
+	//////////////////////
+	////TUTORIAL STUFF////
+	//////////////////////
 	
 	let whiteArrow = SKSpriteNode(texture: SKTexture(imageNamed: "whiteArrow"))
 	let blackArrow = SKSpriteNode(texture: SKTexture(imageNamed: "blackArrow"))
 	
 	//start -> click to continue
 	func step1() {
-		//print("step 1 started")
 		self.gameState = .part1
 		
 		//intro label thing
@@ -179,13 +168,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(self.clickIndicator)
 			self.addChild(self.label2)
 			self.mouseInteractionEnabled = true
-			//TODO: add arrow
 		}
 	}
 	
 	//this is ur player -> wait until space pressed
 	func step2() {
-		//print("step 2 started")
+		self.gameState = .part2
+		
 		self.label2.removeFromParent()
 		self.blackArrow.removeFromParent()
 		
@@ -202,7 +191,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		whiteArrow.zRotation = 3.92699
 		self.addChild(whiteArrow)
 		
-		self.gameState = .part2
 		self.keyInteractionEnabled = true
 		self.clickIndicator.removeFromParent()
 		
@@ -212,13 +200,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.spaceInteractionEnabled = true
 			self.mouseInteractionEnabled = true
 		}
-		//self.keyInteractionEnabled = true
-		//waiting for space press
 	}
 	
 	//space pressed -> click to continue
 	func step3() {
-		//print("step 3 started")
 		self.gameState = .part3
 		
 		self.label3.removeFromParent()
@@ -241,8 +226,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//this is your goal -> space to continue
 	func step4() {
-		//print("step 4 started")
-		self.gameState = .part4
+ 		self.gameState = .part4
 		
 		self.label4.removeFromParent()
 		self.blackArrow.removeFromParent()
@@ -264,6 +248,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.mouseInteractionEnabled = false
 		self.spaceInteractionEnabled = false
+		
 		delay(1.8) {
 			self.spaceInteractionEnabled = true
 			self.mouseInteractionEnabled = true
@@ -273,13 +258,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.addChild(spaceLabel)
 		
 		self.clickIndicator.removeFromParent()
-		//add "this is your goal " label
-		
-		
 	}
 	
 	func step5() {
-		//print("step 5 started")
 		self.gameState = .part5
 		
 		self.label5.removeFromParent()
@@ -287,7 +268,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.spaceLabel.removeFromParent()
 		self.whiteArrow.removeFromParent()
 		
-		//add "use arrow keys to move" label
 		self.label6.fontColor = .white
 		self.label6.fontSize = 28
 		self.label6.position = CGPoint(x: -290, y: -200)
@@ -306,41 +286,24 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 		}
 		
-		//delay(0.5) {
-			arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
-			self.thePlayer.run(goRight)
-		
-			delay(1.0) {
-				arrowsNormal.texture = SKTexture(imageNamed: "arrowsLeft")
-				//self.thePlayer.run(goBack)
-				self.thePlayer.run(goLeft)
-					//arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
+		//arrow animation
+		arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
+		self.thePlayer.run(goRight)
+		delay(1.0) {
+			arrowsNormal.texture = SKTexture(imageNamed: "arrowsLeft")
+			self.thePlayer.run(goLeft)
+				delay(1.0) {
+					arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
+					self.thePlayer.run(goBack)
 					delay(1.0) {
-						arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
-						self.thePlayer.run(goBack)
-						
+						arrowsNormal.texture = SKTexture(imageNamed: "arrowsUp")
+						self.thePlayer.run(jump)
 						delay(1.0) {
-							arrowsNormal.texture = SKTexture(imageNamed: "arrowsUp")
-							self.thePlayer.run(jump)
-							delay(1.0) {
-								arrowsNormal.removeFromParent()
-							}
+							arrowsNormal.removeFromParent()
 						}
-					//}
+					}
 				}
 			}
-		//}
-		
-		//animation
-		/*
-		let goRight = SKAction.moveTo(x: self.thePlayer.position.x + 100, duration: 1.0)
-		let goLeft = SKAction.moveTo(x: self.thePlayer.position.x - 200, duration: 2.0)
-		let goBack = SKAction.moveTo(x: self.thePlayer.position.x, duration: 1.0)
-		let jump = SKAction.run {
-			self.thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
-		}
-		let sequence = SKAction.sequence([goRight, goLeft, goBack, jump])
-		delay(0.5) {self.thePlayer.run(sequence)} */
 		
 		delay(4.0) {
 			self.step6()
@@ -350,7 +313,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func step6() {
-		//print("step 6 started")
 		self.gameState = .part6
 		
 		self.label6.removeFromParent()
@@ -365,14 +327,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label8.position = CGPoint(x: 280, y: -190)
 		self.addChild(label8)
 		
-		//click here indicator
 		self.clickIndicator.setupProperties(pos: CGPoint(x: 150, y: -90))
 		self.addChild(self.clickIndicator)
-		
 	}
 	
 	func step7() {
-		//print("step 7 started")
 		self.gameState = .part7
 		
 		self.clickIndicator.removeFromParent()
@@ -380,12 +339,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.mouseInteractionEnabled = false
 		self.spaceInteractionEnabled = false
-		
-		/*delay(1.8) {
-			self.spaceInteractionEnabled = true
-			self.mouseInteractionEnabled = true
-		}*/
-		
+
 		self.label8.removeFromParent()
 		
 		self.label9.fontColor = .white
@@ -408,7 +362,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9.run(fadeInAction)
 		self.label9Line2.run(fadeInAction)
 		self.spaceLabel.run(fadeInAction)
-			
 			delay(1.0) {
 				self.spaceInteractionEnabled = true
 				self.mouseInteractionEnabled = true
@@ -417,7 +370,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func step8() {
-		//print("step 8 started")
 		self.gameState = .part8
 		
 		self.label9.run(fadeOutAction)
@@ -507,7 +459,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			currentLevel += 1
 			
 			if(currentLevel <= levelsArray.count) {
-				//remove player instantly
 				self.transistionAnimation()
 				//unload level and load next level
 				delay(3.5) {
@@ -558,7 +509,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		title.fontColor = .white
 		title.zPosition = 2
 		
-		let scoreLabel = SKLabelNode(text: "Score \(1000 - (totalBlobsAdded * 10))")
+		var score = 1000 - (totalBlobsAdded * 20)
+		if(score < 0) {score = 0}
+		
+		let scoreLabel = SKLabelNode(text: "Score: \(score)")
 		scoreLabel.fontSize = 25
 		scoreLabel.fontName = "AvenirNext-Bold"
 		scoreLabel.position.y = -60
@@ -579,16 +533,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func unloadLevel() {
 		
 		if let child = self.childNode(withName: "floor") as? SKShapeNode { child.removeFromParent() }
-		
+		if let child = self.childNode(withName: "goal") as? SKShapeNode { child.removeFromParent() }
 		for i in 1...numberOfPlatforms {
 			if let child = self.childNode(withName: "platform\(i)") as? SKShapeNode { child.removeFromParent() }
 		}
-		
 		for i in 1...numberOfBlobs {
 			if let child = self.childNode(withName: "normalBlob\(i)") as? SKShapeNode { child.removeFromParent() }
 		}
-		
-		if let child = self.childNode(withName: "goal") as? SKShapeNode { child.removeFromParent() }
 	}
 	
 	
@@ -714,33 +665,5 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		if upPressed && thePlayer.physicsBody?.velocity.dy == 0 {
 			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 		}
-	}
-}
-
-//delays animations, this makes the code musch easier to read
-public func delay(_ delay: Double, closure: @escaping ()->()) {
-	let when = DispatchTime.now() + delay
-	DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
-}
-
-class ClickIndicator: SKShapeNode {
-	func setupProperties(pos: CGPoint) {
-		//print("CALLED YES YSE")
-		self.position = pos
-		self.fillColor = .clear
-		self.strokeColor = .black
-		self.lineWidth = 1.0
-		self.isAntialiased = false
-		self.name = "clickIndicator"
-		
-		let action = SKAction.scale(to: 1.5, duration: 1.0)
-		action.timingMode = .easeInEaseOut
-		
-		let action2 = SKAction.scale(to: 1.0, duration: 1.0)
-		action.timingMode = .easeInEaseOut
-		
-		let sequence = SKAction.sequence([action, action2])
-		let continuous = SKAction.repeatForever(sequence)
-		self.run(continuous)
 	}
 }
