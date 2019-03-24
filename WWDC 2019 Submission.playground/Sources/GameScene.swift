@@ -8,11 +8,13 @@ let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
 let debugMode = false
+
 public var numberOfBlobs = 0
 var numberOfPlatforms = 0
 
 public var totalBlobsAdded = 0
 
+//keeps track of where we are in the game
 enum GameState {
 	case part1
 	case part2
@@ -35,41 +37,38 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	var mouseInteractionEnabled = false
 	var spaceInteractionEnabled = false
 	
-	var spaceClicked = false
-	
-	let fadeInAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
+	//custom SKActions
+	let fadeInAction  = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
 	let fadeOutAction = SKAction.fadeAlpha(to: 0.0, duration: 1.0)
 	
 	//labels
-	let titleLabel = SKLabelNode(text: "INKBLOB")
-	let spaceLabel = SKLabelNode(text: "(Press space to proceed)")
-	let goodLuck = SKLabelNode(text: "Good Luck!")
-	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
-	let label2 = SKLabelNode(text: "Click here to continue.")
-	let label3 = SKLabelNode(text: "This is your player")
-	let label4 = SKLabelNode(text: "Click here to continue.")
-	let label5 = SKLabelNode(text: "This is your goal.")
-	let label6 = SKLabelNode(text: "Use your arrow keys to move")
-	let label7 = SKLabelNode(text: "But the more you use, the lower your score")
-	let label8 = SKLabelNode(text: "Click here to continue")
-	let label9 = SKLabelNode(text: "Clicking will cause ink to spill, revealing the map.")
+	let titleLabel  = SKLabelNode(text: "INKBLOB")
+	let spaceLabel  = SKLabelNode(text: "(Press space to proceed)")
+	let goodLuck    = SKLabelNode(text: "Good Luck!")
+	let label1      = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
+	let label2      = SKLabelNode(text: "Click here to continue.")
+	let label3      = SKLabelNode(text: "This is your player")
+	let label4      = SKLabelNode(text: "Click here to continue.")
+	let label5      = SKLabelNode(text: "This is your goal.")
+	let label6      = SKLabelNode(text: "Use your arrow keys to move")
+	let label7      = SKLabelNode(text: "But the more you use, the lower your score")
+	let label8      = SKLabelNode(text: "Click here to continue")
+	let label9      = SKLabelNode(text: "Clicking will cause ink to spill, revealing the map.")
 	let label9Line2 = SKLabelNode(text: "But the more you use, the lower your score will be.")
 	let label5Line2 = SKLabelNode(text: "Get here to advance to the next level.")
-	
-	var blottingAllowed = false
 	
 	//key press statuses
 	var leftPressed = false
 	var rightPressed = false
 	var upPressed = false
 	var downPressed = false
+	var spacePressed = false
 	
-	var touchingGround = false
-	
+	//player node
 	let thePlayer: SKShapeNode = SKShapeNode(rectOf: CGSize(width: 20, height: 20))
-	
+	//click indicator
 	let clickIndicator = ClickIndicator(ellipseOf: CGSize(width: 50.0, height: 50.0))
-	
+	//levels info array
 	let levelsArray = LevelData().array
 	
 	public override func didMove(to view: SKView) {
@@ -180,7 +179,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			self.addChild(self.clickIndicator)
 			self.addChild(self.label2)
-			self.blottingAllowed = true
 			self.mouseInteractionEnabled = true
 			//TODO: add arrow
 		}
@@ -189,8 +187,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	//this is ur player -> wait until space pressed
 	func step2() {
 		//print("step 2 started")
-		self.blottingAllowed = false
-		
 		self.label2.removeFromParent()
 		self.blackArrow.removeFromParent()
 		
@@ -498,8 +494,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		floor.name = "floor"
 		self.addChild(floor)
 		
-		//print("FINISHED LOADING LEVEL")
-		
 		levelLoading = false
 	}
 	
@@ -508,15 +502,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	public func didBegin(_ contact: SKPhysicsContact) {
 		let collision: UInt32 = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
 		
-		if collision == playerCategory | groundCategory {
-			touchingGround = true
-			//print("collision between ground and player occured")
-		}
-		
 		if collision == playerCategory | goalCategory && !levelLoading {
-			//print("collision between goal and player occured")
-			//TODO: maybe animate this?
-			
 			//remove player instantly
 			if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
 			
@@ -525,7 +511,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(currentLevel <= levelsArray.count) {
 				//remove player instantly
 				self.transistionAnimation()
-				
 				//unload level and load next level
 				delay(3.5) {
 					self.arrowKeyControlsEnabled = true
@@ -534,10 +519,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 					self.loadLevel(self.levelsArray[self.currentLevel - 1])
 				}
 			} else {
-				//print("WINNER!")
+				//winning animation
 				self.winnerAnimation()
-				blottingAllowed = false
-				//WIN ANIMATION
 			}
 		}
 	}
@@ -561,8 +544,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		zoom.timingMode = .easeOut
 		addChild(title)
 		title.run(zoom)
-		
-		delay(5.5) { self.title.removeFromParent() }
+		delay(4.5) { self.title.removeFromParent() }
 	}
 	
 	func winnerAnimation() {
@@ -593,35 +575,22 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		addChild(scoreLabel)
 		scoreLabel.run(zoom)
 		title.run(zoom)
-		
-		//delay(5.5) { self.title.removeFromParent() }
 	}
 	
+	//removes all the nodes from the level
 	func unloadLevel() {
 		
-		//print("UNLOADING LEVEL")
-		
-		if let child = self.childNode(withName: "floor") as? SKShapeNode {
-			child.removeFromParent()
-		}
+		if let child = self.childNode(withName: "floor") as? SKShapeNode { child.removeFromParent() }
 		
 		for i in 1...numberOfPlatforms {
-			if let child = self.childNode(withName: "platform\(i)") as? SKShapeNode {
-				child.removeFromParent()
-			}
+			if let child = self.childNode(withName: "platform\(i)") as? SKShapeNode { child.removeFromParent() }
 		}
 		
 		for i in 1...numberOfBlobs {
-			if let child = self.childNode(withName: "normalBlob\(i)") as? SKShapeNode {
-				child.removeFromParent()
-			}
+			if let child = self.childNode(withName: "normalBlob\(i)") as? SKShapeNode { child.removeFromParent() }
 		}
 		
-		if let child = self.childNode(withName: "goal") as? SKShapeNode {
-			child.removeFromParent()
-		}
-		
-		//print("UNLOAD SUCCESSFUL")
+		if let child = self.childNode(withName: "goal") as? SKShapeNode { child.removeFromParent() }
 	}
 	
 	
@@ -638,36 +607,33 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	/////////////////////
 	
 	func touchDown(atPoint pos : CGPoint) {
-		//possibly make it so that ink bleed until mouse is released??
 		guard mouseInteractionEnabled == true else { return }
-		//print("CLICK WAS ALLOWED")
 		
 		let touchedNodes = self.nodes(at: pos)
-		//print(touchedNodes)
 		
 		//make sure that extra blobs aren't created during the tutorial scene
 		for i in 0..<touchedNodes.count {
 			if touchedNodes[i].name == "clickIndicator" {
 				let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 				shaderTest.setupProperties(pos: pos, inBack: true)
-				self.addChild(shaderTest)
 				shaderTest.animate(amount: 2.2)
+				self.addChild(shaderTest)
 				
 				switch gameState {
-				case .part1:
-					step2()
-				case .part2:
-					step3()
-				case .part3:
-					step4()
-				case .part4:
-					step5()
-				case .part5:
-					step6()
-				case .part6:
-					step7()
-				default:
-					break
+					case .part1:
+						step2()
+					case .part2:
+						step3()
+					case .part3:
+						step4()
+					case .part4:
+						step5()
+					case .part5:
+						step6()
+					case .part6:
+						step7()
+					default:
+						break
 				}
 			}
 		}
@@ -676,31 +642,16 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		if(gameState == .playing) {
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos, inBack: true)
-			self.addChild(shaderTest)
 			shaderTest.animate(amount: 1.5)
+			self.addChild(shaderTest)
 			totalBlobsAdded += 1
-			//print("Blobs added: \(totalBlobsAdded)")
 		}
-	}
-	
-	func touchMoved(toPoint pos : CGPoint) {
-	}
-	
-	func touchUp(atPoint pos : CGPoint) {
 	}
 	
 	public override func mouseDown(with event: NSEvent) {
 		touchDown(atPoint: event.location(in: self))
 	}
-	
-	public override func mouseDragged(with event: NSEvent) {
-		touchMoved(toPoint: event.location(in: self))
-	}
-	
-	public override func mouseUp(with event: NSEvent) {
-		touchUp(atPoint: event.location(in: self))
-	}
-	
+
 	///////////////////
 	///KEY HANDLERS////
 	///////////////////
@@ -708,36 +659,36 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	public override func keyDown(with event: NSEvent) {
 		guard keyInteractionEnabled == true else { return }
 		switch Int(event.keyCode) {
-		case kVK_LeftArrow:
-			guard arrowKeyControlsEnabled == true else { return }
-			leftPressed = true
-		case kVK_RightArrow:
-			guard arrowKeyControlsEnabled == true else { return }
-			rightPressed = true
-		case kVK_UpArrow:
-			guard arrowKeyControlsEnabled == true else { return }
-			upPressed = true
-		case kVK_Space:
-			guard spaceInteractionEnabled == true else { return }
-			spaceClicked = true
-			switch gameState {
-			case .part2:
-				step3()
-			case .part4:
-				step5()
-			case .part7:
-				step8()
-			case .part8:
-				step9()
+			case kVK_LeftArrow:
+				guard arrowKeyControlsEnabled == true else { return }
+				leftPressed = true
+			case kVK_RightArrow:
+				guard arrowKeyControlsEnabled == true else { return }
+				rightPressed = true
+			case kVK_UpArrow:
+				guard arrowKeyControlsEnabled == true else { return }
+				upPressed = true
+			case kVK_Space:
+				guard spaceInteractionEnabled == true else { return }
+				spacePressed = true
+				switch gameState {
+					case .part2:
+						step3()
+					case .part4:
+						step5()
+					case .part7:
+						step8()
+					case .part8:
+						step9()
+					default:
+						break
+				}
 			default:
 				break
-			}
-		default:
-			break
 		}
 		
-		//something onther than sapce
-		if(gameState == .part5 && !spaceClicked) {
+		//something onther than sapce pressed
+		if(gameState == .part5 && !spacePressed) {
 			step6()
 		}
 		
@@ -752,7 +703,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		case kVK_UpArrow:
 			upPressed = false
 		case kVK_Space:
-			spaceClicked = false
+			spacePressed = false
 		default:
 			break
 		}
@@ -763,9 +714,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		if leftPressed  { thePlayer.position.x -= 10 }
 		if rightPressed { thePlayer.position.x += 10 }
 		
+		//jump (only if grounded)
 		if upPressed && thePlayer.physicsBody?.velocity.dy == 0 {
 			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
-			
 		}
 	}
 }
