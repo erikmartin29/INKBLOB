@@ -158,7 +158,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//start -> click to continue
 	func step1() {
-		print("step 1 started")
+		//print("step 1 started")
 		self.gameState = .part1
 		
 		//intro label thing
@@ -188,7 +188,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//this is ur player -> wait until space pressed
 	func step2() {
-		print("step 2 started")
+		//print("step 2 started")
 		self.blottingAllowed = false
 		
 		self.label2.removeFromParent()
@@ -223,7 +223,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//space pressed -> click to continue
 	func step3() {
-		print("step 3 started")
+		//print("step 3 started")
 		self.gameState = .part3
 		
 		self.label3.removeFromParent()
@@ -246,7 +246,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//this is your goal -> space to continue
 	func step4() {
-		print("step 4 started")
+		//print("step 4 started")
 		self.gameState = .part4
 		
 		self.label4.removeFromParent()
@@ -284,7 +284,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func step5() {
-		print("step 5 started")
+		//print("step 5 started")
 		self.gameState = .part5
 		
 		self.label5.removeFromParent()
@@ -355,7 +355,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func step6() {
-		print("step 6 started")
+		//print("step 6 started")
 		self.gameState = .part6
 		
 		self.label6.removeFromParent()
@@ -377,7 +377,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func step7() {
-		print("step 7 started")
+		//print("step 7 started")
 		self.gameState = .part7
 		
 		self.clickIndicator.removeFromParent()
@@ -417,7 +417,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func step8() {
-		print("step 8 started")
+		//print("step 8 started")
 		self.gameState = .part8
 		
 		self.label9.run(fadeOutAction)
@@ -452,7 +452,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func loadLevel(_ level: Level) {
 		
-		print("LOADING LEVEL \(level.playerStartPosition)")
+		//print("LOADING LEVEL \(level.playerStartPosition)")
 		
 		//add platforms
 		for index in 0..<level.platformFormation.count {
@@ -534,7 +534,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 					self.loadLevel(self.levelsArray[self.currentLevel - 1])
 				}
 			} else {
-				print("WINNER!")
+				//print("WINNER!")
 				self.winnerAnimation()
 				blottingAllowed = false
 				//WIN ANIMATION
@@ -640,10 +640,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func touchDown(atPoint pos : CGPoint) {
 		//possibly make it so that ink bleed until mouse is released??
 		guard mouseInteractionEnabled == true else { return }
-		print("CLICK WAS ALLOWED")
+		//print("CLICK WAS ALLOWED")
 		
 		let touchedNodes = self.nodes(at: pos)
-		print(touchedNodes)
+		//print(touchedNodes)
 		
 		//make sure that extra blobs aren't created during the tutorial scene
 		for i in 0..<touchedNodes.count {
@@ -679,7 +679,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(shaderTest)
 			shaderTest.animate(amount: 1.5)
 			totalBlobsAdded += 1
-			print("Blobs added: \(totalBlobsAdded)")
+			//print("Blobs added: \(totalBlobsAdded)")
 		}
 	}
 	

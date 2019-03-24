@@ -2,7 +2,6 @@ import Foundation
 
 
 public class LevelData {
-//make it so that I can use those varibles ^^^
 	let array: [Level] = [
 		
 			/*Tutorial*/
