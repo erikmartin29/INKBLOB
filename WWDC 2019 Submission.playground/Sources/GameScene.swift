@@ -45,10 +45,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	let label4 = SKLabelNode(text: "Click here to continue.")
 	let label5 = SKLabelNode(text: "This is your goal.")
 	let label6 = SKLabelNode(text: "Use your arrow keys to move")
-	let label7 = SKLabelNode(text: "You have 3 ink drops per level. If you mess up, press r to restart")
+	let label7 = SKLabelNode(text: "But the more you use, the lower your score")
 	let label8 = SKLabelNode(text: "Click here to continue")
-	let label9 = SKLabelNode(text: "As you can see, using ink reveals the map.")
-	let label9Line2 = SKLabelNode(text: "You have 3 ink blobs per level. Use them wisely")
+	let label9 = SKLabelNode(text: "Clicking will cause ink to spill, revealing the map.")
+	let label9Line2 = SKLabelNode(text: "But the more you use, the lower your score will be.")
 	let label5Line2 = SKLabelNode(text: "Get here to advance to the next level.")
 	
 	var blottingAllowed = false
@@ -83,13 +83,13 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50), goalPos: CGPoint(x: 275, y: 300)),
 			/*Level 1:*/
 			Level(formation: [  (Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: -30, y:  -150)),
-								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 210, y: -30)),
+								(Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: 270, y: -30)),
 								(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: 150)),
-								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 280, y: 280)),
+								(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 380, y: 280)),
 								],
 				  
 				  playerStartPos: CGPoint(x: 50, y: 50),
-				  goalPos: CGPoint(x: 440, y: 440)),
+				  goalPos: CGPoint(x: 440, y: 410)),
 			/*Level 2:*/
 			Level(formation: [  (Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: -540, y: -90)),
 								(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: -150)),
@@ -349,11 +349,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.label8.fontColor = .black
 		self.label8.fontSize = 35
-		self.label8.position = CGPoint(x: 150, y: -100)
+		self.label8.position = CGPoint(x: 280, y: -190)
 		self.addChild(label8)
 		
 		//click here indicator
-		self.clickIndicator.setupProperties(pos: CGPoint(x: 150, y: -20))
+		self.clickIndicator.setupProperties(pos: CGPoint(x: 150, y: -90))
 		self.addChild(self.clickIndicator)
 		
 	}
@@ -366,6 +366,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.mouseInteractionEnabled = false
 		self.spaceInteractionEnabled = false
+		
 		delay(1.8) {
 			self.spaceInteractionEnabled = true
 			self.mouseInteractionEnabled = true
@@ -379,11 +380,21 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9Line2.fontColor = .white
 		self.label9Line2.fontSize = 25
 		self.label9Line2.position = CGPoint(x: 150, y: -50)
-		self.addChild(label9)
-		self.addChild(label9Line2)
+		self.label9.alpha = 0.0
+		self.label9Line2.alpha = 0.0
 		
-		self.spaceLabel.position = CGPoint(x: label9Line2.position.x, y: label9Line2.position.y - 30)
-		self.addChild(spaceLabel)
+		delay(2.1) {
+		let fadeInAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
+		fadeInAction.timingMode = .easeIn
+		self.spaceLabel.position = CGPoint(x: self.label9Line2.position.x, y: self.label9Line2.position.y - 30)
+		self.spaceLabel.alpha = 0.0
+		self.addChild(self.spaceLabel)
+		self.addChild(self.label9)
+		self.addChild(self.label9Line2)
+		self.label9.run(fadeInAction)
+		self.label9Line2.run(fadeInAction)
+		self.spaceLabel.run(fadeInAction)
+		}
 		
 		//ink explain label #1
 		
@@ -400,7 +411,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		goodLuck.position = CGPoint(x: 150, y: 25)
 		addChild(goodLuck)
 		label9.text = "Press space to start the first level."
-		label9Line2.text = "If you mess up, press R to restart a level."
+		label9Line2.text = ""
 	}
 	
 	func step9() {
@@ -463,9 +474,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		//add the floor
-		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 100))
+		let floor: SKShapeNode = SKShapeNode(rectOf: CGSize(width: self.scene?.frame.width ?? 400, height: 200))
 		floor.fillColor = .white
-		floor.position = CGPoint(x: 0, y: -350)
+		floor.position = CGPoint(x: 0, y: -400)
 		floor.physicsBody = SKPhysicsBody(rectangleOf: floor.frame.size)
 		floor.physicsBody?.affectedByGravity = false
 		floor.physicsBody?.isDynamic = false
@@ -615,7 +626,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 				shaderTest.setupProperties(pos: pos, inBack: true)
 				self.addChild(shaderTest)
-				shaderTest.animate(amount: 1.9)
+				shaderTest.animate(amount: 2.2)
 				switch gameState {
 				case .part1:
 					step2()
