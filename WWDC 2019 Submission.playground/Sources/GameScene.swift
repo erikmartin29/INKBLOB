@@ -11,6 +11,8 @@ let debugMode = false
 public var numberOfBlobs = 0
 var numberOfPlatforms = 0
 
+public var totalBlobsAdded = 0
+
 enum GameState {
 	case part1
 	case part2
@@ -157,7 +159,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(goal)
 		}
 		
-		
+		fadeInAction.timingMode = .easeIn
+		fadeOutAction.timingMode = .easeIn
 		spaceLabel.fontSize = 28
 		spaceLabel.fontName = "AvenirNext-Bold"
 		
@@ -169,8 +172,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
 		
 		//make sure the player cannot go outside of the screen
-		let xRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.width/2)
-		let yRange = SKRange(lowerLimit:-1*size.width/2,upperLimit:size.height/2)
+		let xRange = SKRange(lowerLimit:((-1*size.width/2) + 10),upperLimit:((size.width/2) - 10))
+		let yRange = SKRange(lowerLimit:((-1*size.height/2) + 10),upperLimit:((size.height/2) - 10))
 		thePlayer.constraints = [SKConstraint.positionX(xRange,y:yRange)]
 		
 		label1.fontName = "AvenirNext-Heavy"
@@ -404,20 +407,49 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		print("step 8 started")
 		self.gameState = .part8
 		
-		self.spaceLabel.removeFromParent()
+		let fadeOutAction = SKAction.fadeAlpha(to: 0.0, duration: 1.0)
+		fadeInAction.timingMode = .easeIn
+		
+		self.label9.run(fadeOutAction)
+		self.label9Line2.run(fadeOutAction)
+		self.spaceLabel.run(fadeOutAction)
+		/*self.spaceLabel.removeFromParent()
 		goodLuck.fontColor = .white
 		goodLuck.fontSize = 40
 		goodLuck.fontName = "AvenirNext-Bold"
 		goodLuck.position = CGPoint(x: 150, y: 25)
-		addChild(goodLuck)
-		label9.text = "Press space to start the first level."
-		label9Line2.text = ""
+		addChild(goodLuck)*/
+		//label9.text = "Press space to start the first level."
+		//label9Line2.text = ""
+		
+		delay(1.0) {
+			//add the other platforms
+			let platform1 = Platform(rectOf: CGSize(width: 200, height: 50))
+			platform1.setupProperties(pos: CGPoint(x: 300, y: 0))
+			numberOfPlatforms += 1
+			platform1.name = "platform\(numberOfPlatforms)"
+			platform1.alpha = 0.0
+			self.addChild(platform1)
+			platform1.run(self.fadeInAction)
+			
+			let platform2 = Platform(rectOf: CGSize(width: 200, height: 50))
+			platform2.setupProperties(pos: CGPoint(x: 150, y: 150))
+			numberOfPlatforms += 1
+			platform2.name = "platform\(numberOfPlatforms)"
+			platform2.alpha = 0.0
+			self.addChild(platform2)
+			platform2.run(self.fadeInAction)
+		}
+		
+		//print("numberOfPlatforms: \(numberOfPlatforms)")
+		
+		self.gameState = .playing
+		
 	}
 	
 	func step9() {
+		/*
 		print("step 9 started")
-		self.gameState = .playing
-		
 		self.label9Line2.removeFromParent()
 		self.label9.removeFromParent()
 		self.goodLuck.removeFromParent()
@@ -435,7 +467,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				self.unloadLevel()
 				self.loadLevel(self.levelsArray[self.currentLevel - 1])
 			}
-		}
+		}*/
 	}
 	
 	func loadLevel(_ level: Level) {
@@ -564,9 +596,19 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		title.fontColor = .white
 		title.zPosition = 2
 		
+		let scoreLabel = SKLabelNode(text: "Score \(1000 - (totalBlobsAdded * 10))")
+		scoreLabel.fontSize = 25
+		scoreLabel.position.y = -60
+		scoreLabel.setScale(0.0)
+		scoreLabel.fontColor = .white
+		scoreLabel.zPosition = 2
+		
 		let zoom = SKAction.scale(to: 1.5, duration: 4.5)
 		zoom.timingMode = .easeOut
+		
 		addChild(title)
+		addChild(scoreLabel)
+		scoreLabel.run(zoom)
 		title.run(zoom)
 		
 		//delay(5.5) { self.title.removeFromParent() }
@@ -627,6 +669,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				shaderTest.setupProperties(pos: pos, inBack: true)
 				self.addChild(shaderTest)
 				shaderTest.animate(amount: 2.2)
+				
 				switch gameState {
 				case .part1:
 					step2()
@@ -652,6 +695,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			shaderTest.setupProperties(pos: pos, inBack: true)
 			self.addChild(shaderTest)
 			shaderTest.animate(amount: 1.5)
+			totalBlobsAdded += 1
+			print("Blobs added: \(totalBlobsAdded)")
 		}
 	}
 	
