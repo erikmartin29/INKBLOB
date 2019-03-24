@@ -42,7 +42,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	//labels
 	let titleLabel = SKLabelNode(text: "INKBLOB")
-	let spaceLabel = SKLabelNode(text: "Press space to proceed")
+	let spaceLabel = SKLabelNode(text: "(Press space to proceed)")
 	let goodLuck = SKLabelNode(text: "Good Luck!")
 	let label1 = SKLabelNode(text: "Oh.. I should probably tell you how to play. ")
 	let label2 = SKLabelNode(text: "Click here to continue.")
@@ -141,6 +141,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		addChild(shaderTest)
 		shaderTest.animate(amount: 5.5)
 		titleLabel.fontSize = 50
+		titleLabel.fontName = "AvenirNext-Heavy"
 		titleLabel.fontColor = .white
 		titleLabel.zPosition = 2
 		addChild(titleLabel)
@@ -766,11 +767,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 			
 		}
-	
-		/*if upPressed && touchingGround {
-			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
-			touchingGround = false
-		}*/
 	}
 }
 
@@ -786,7 +782,7 @@ class ClickIndicator: SKShapeNode {
 		self.position = pos
 		self.fillColor = .clear
 		self.strokeColor = .black
-		self.lineWidth = 0.5
+		self.lineWidth = 1.0
 		self.isAntialiased = false
 		self.name = "clickIndicator"
 		

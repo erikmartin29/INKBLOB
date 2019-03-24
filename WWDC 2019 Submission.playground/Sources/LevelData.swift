@@ -6,16 +6,23 @@ public class LevelData {
 	let array: [Level] = [
 		
 			/*Tutorial*/
-			Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50), goalPos: CGPoint(x: 275, y: 300)),
+			Level(formation:
+				
+				[
+					(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))
+				],
+				  
+				playerStartPos: CGPoint(x: -300, y: 50),
+				goalPos: CGPoint(x: 275, y: 300)),
 			
 			/*Level 1:*/
 			Level(formation:
 				
-			[   (Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: -30, y:  -150)),
-			    (Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: 270, y: -30)),
-				(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: 150)),
-				(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 380, y: 280)),
-			],
+				[   (Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: -30, y:  -150)),
+					(Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: 270, y: -30)),
+					(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: 150)),
+					(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 380, y: 280)),
+				],
 				  
 				playerStartPos: CGPoint(x: 50, y: 50),
 				goalPos: CGPoint(x: 440, y: 410)),
