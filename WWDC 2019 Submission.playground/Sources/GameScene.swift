@@ -7,11 +7,7 @@ let groundCategory: UInt32 = 0x1 << 1 //2
 let goalCategory:   UInt32 = 0x1 << 2 //4
 
 //change debug mode to true to see things more clearly
-let debugMode = true
-
-let levelTesting = 1
-public let blobSize = 1.5
-
+let debugMode = false
 public var numberOfBlobs = 0
 var numberOfPlatforms = 0
 
@@ -74,35 +70,60 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	//TODO: parse this data in a file (maybe JSON?)
 	//let levelsArray: [Level] = []
 	/*let level1: Level = Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 0, y: -200)),
-										  (Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x:300, y: -50)),
-										  (Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
-										  (Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))],
-							  			  playerStartPos: CGPoint(x: -350, y: 50))
+	(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x:300, y: -50)),
+	(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
+	(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))],
+	playerStartPos: CGPoint(x: -350, y: 50))
 	
 	let level2: Level = Level(formation: [(Platform(rectOf: CGSize(width: 3, height: 500)),CGPoint(x: 100, y: -200))], playerStartPos: CGPoint(x: -200, y: 50))*/
 	
 	//make it so that I can use those varibles ^^^
 	let levelsArray: [Level] =
-	[
-		Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50), goalPos: CGPoint(x: 275, y: 300)),
-        /*Level 1:*/
-		Level(formation: [  (Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: -30, y:  -150)),
-							(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 210, y: -30)),
-							(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: 150)),
-							(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 280, y: 280)),
-						],
-			  
-						playerStartPos: CGPoint(x: 50, y: 50),
-						goalPos: CGPoint(x: 440, y: 440)),
-		/*Level 2:*/
-		Level(formation: [  (Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
-							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
-							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
-							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200)),
-							(Platform(rectOf: CGSize(width: 200, height: 100)),CGPoint(x: 0, y: -200))],
-			  
-			  				playerStartPos: CGPoint(x: 50, y: 50),
-							goalPos: CGPoint(x: 440, y: 440))
+		[
+			Level(formation: [(Platform(rectOf: CGSize(width: 200, height: 50)),CGPoint(x: 150, y: -200))],  playerStartPos: CGPoint(x: -300, y: 50), goalPos: CGPoint(x: 275, y: 300)),
+			/*Level 1:*/
+			Level(formation: [  (Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: -30, y:  -150)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 210, y: -30)),
+								(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: 150)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 280, y: 280)),
+								],
+				  
+				  playerStartPos: CGPoint(x: 50, y: 50),
+				  goalPos: CGPoint(x: 440, y: 440)),
+			/*Level 2:*/
+			Level(formation: [  (Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: -540, y: -90)),
+								(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 30, y: -150)),
+								(Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: 540, y: -90)),
+								(Platform(rectOf: CGSize(width: 60, height:  60)),CGPoint(x: 210, y: -30)),
+								(Platform(rectOf: CGSize(width: 60, height:  60)),CGPoint(x: 270, y: 90)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 150, y: 150)),
+								(Platform(rectOf: CGSize(width: 60, height: 300)),CGPoint(x: 30, y: 90)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: -90, y: 150)),
+								(Platform(rectOf: CGSize(width: 60, height: 180)),CGPoint(x: -150, y: 330)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: -210, y: 90)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: -270, y: 210)),
+								],
+				  
+				  playerStartPos: CGPoint(x: 450, y: -270),
+				  goalPos: CGPoint(x: -390, y: 330)),
+			
+			/*Level 3*/
+			Level(formation: [  (Platform(rectOf: CGSize(width: 360, height: 60)),CGPoint(x: -420, y: 330)),
+								(Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: -240, y: 270)),
+								(Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: -60, y: 270)),
+								(Platform(rectOf: CGSize(width: 120, height:  60)),CGPoint(x: 180, y: 270)),
+								(Platform(rectOf: CGSize(width: 180, height:  60)),CGPoint(x: -150, y: -150)),
+								(Platform(rectOf: CGSize(width: 360, height: 60)),CGPoint(x: 240, y: 150)),
+								(Platform(rectOf: CGSize(width: 120, height: 180)),CGPoint(x: 540, y: 150)),
+								(Platform(rectOf: CGSize(width: 60, height: 60)),CGPoint(x: 270, y: -270)),
+								(Platform(rectOf: CGSize(width: 120, height: 60)),CGPoint(x: 480, y: -150)),
+								(Platform(rectOf: CGSize(width: 180, height: 60)),CGPoint(x: 390, y: -210)),
+								],
+				  
+				  playerStartPos: CGPoint(x: -510, y: 400),
+				  goalPos: CGPoint(x: 330, y: -225))
+			
+			
 	]
 	
 	public override func didMove(to view: SKView) {
@@ -111,7 +132,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		
-		/*self.introAnimation()
+		self.introAnimation()
 		levelLoading = true
 		self.loadLevel(self.levelsArray[self.currentLevel - 1])
 		
@@ -134,10 +155,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			goal.physicsBody?.contactTestBitMask = playerCategory
 			goal.name = "goal"
 			self.addChild(goal)
-		} */
-		
-		//SKIP TUTORIAL
-		step9()
+		}
 		
 		
 		spaceLabel.fontSize = 28
@@ -167,7 +185,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		label5Line2.fontName = "AvenirNext-DemiBold"
 		label9Line2.fontName = "AvenirNext-DemiBold"
-
+		
 	}
 	
 	func introAnimation() {
@@ -316,7 +334,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.step6()
 			self.arrowKeyControlsEnabled = true
 		}
-
+		
 	}
 	
 	func step6() {
@@ -374,7 +392,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func step8() {
 		print("step 8 started")
 		self.gameState = .part8
-	
+		
 		self.spaceLabel.removeFromParent()
 		goodLuck.fontColor = .white
 		goodLuck.fontSize = 40
@@ -393,10 +411,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9.removeFromParent()
 		self.goodLuck.removeFromParent()
 		
-		self.mouseInteractionEnabled = true
-		self.arrowKeyControlsEnabled = true
-		self.keyInteractionEnabled = true
-		
 		currentLevel += 1
 		
 		if(currentLevel <= levelsArray.count) {
@@ -407,17 +421,12 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			delay(3.5) {
 				self.arrowKeyControlsEnabled = true
 				if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
-				//self.unloadLevel()
-				var levelToLoad = self.currentLevel
-				if(debugMode) {
-					levelToLoad = levelTesting + 1
-				}
-				
-				self.loadLevel(self.levelsArray[levelToLoad - 1])
+				self.unloadLevel()
+				self.loadLevel(self.levelsArray[self.currentLevel - 1])
 			}
 		}
 	}
-
+	
 	func loadLevel(_ level: Level) {
 		
 		print("LOADING LEVEL \(level.playerStartPosition)")
@@ -442,8 +451,8 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			//add the goal
 			let goal: SKShapeNode = SKShapeNode(ellipseOf: CGSize(width: 50, height: 50))
-			goal.position = CGPoint(x: level.goalPosition.x, y: level.goalPosition.x - 50)
-			goal.physicsBody? = SKPhysicsBody.init(circleOfRadius: 25)
+			goal.position = CGPoint(x: level.goalPosition.x, y: level.goalPosition.y - 50)
+			goal.physicsBody = SKPhysicsBody.init(circleOfRadius: 25)
 			goal.fillColor = .black
 			goal.physicsBody?.affectedByGravity = false
 			goal.physicsBody?.isDynamic = false
@@ -517,7 +526,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
 		shaderTest.animate(amount: 5.5)
 		addChild(shaderTest)
-
+		
 		title.text = "LEVEL \(currentLevel - 1)"
 		title.fontSize = 50
 		title.setScale(0.0)
@@ -544,7 +553,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		title.fontColor = .white
 		title.zPosition = 2
 		
-		let zoom = SKAction.scale(to: 1.5, duration: 3.5)
+		let zoom = SKAction.scale(to: 1.5, duration: 4.5)
 		zoom.timingMode = .easeOut
 		addChild(title)
 		title.run(zoom)
@@ -608,31 +617,30 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 				self.addChild(shaderTest)
 				shaderTest.animate(amount: 1.9)
 				switch gameState {
-					case .part1:
-						step2()
-					case .part2:
-						step3()
-					case .part3:
-						step4()
-					case .part4:
-						step5()
-					case .part5:
-						step6()
-					case .part6:
-						step7()
-					default:
-						break
+				case .part1:
+					step2()
+				case .part2:
+					step3()
+				case .part3:
+					step4()
+				case .part4:
+					step5()
+				case .part5:
+					step6()
+				case .part6:
+					step7()
+				default:
+					break
 				}
 			}
 		}
 		
 		//this is how blobs can be added after the tutorial scene
 		if(gameState == .playing) {
-			print("test")
 			let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1000, height: 1000))
 			shaderTest.setupProperties(pos: pos, inBack: true)
 			self.addChild(shaderTest)
-			shaderTest.animate(amount: blobSize)
+			shaderTest.animate(amount: 1.5)
 		}
 	}
 	
@@ -661,39 +669,39 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	public override func keyDown(with event: NSEvent) {
 		guard keyInteractionEnabled == true else { return }
 		switch Int(event.keyCode) {
-			case kVK_LeftArrow:
-				guard arrowKeyControlsEnabled == true else { return }
-				leftPressed = true
-			case kVK_RightArrow:
-				guard arrowKeyControlsEnabled == true else { return }
-				rightPressed = true
-			case kVK_UpArrow:
-				guard arrowKeyControlsEnabled == true else { return }
-				upPressed = true
-			case kVK_Space:
-				guard spaceInteractionEnabled == true else { return }
-				spaceClicked = true
-				switch gameState {
-				case .part2:
-					step3()
-				case .part4:
-					step5()
-				case .part7:
-					step8()
-				case .part8:
-					step9()
-				default:
-					break
-				}
+		case kVK_LeftArrow:
+			guard arrowKeyControlsEnabled == true else { return }
+			leftPressed = true
+		case kVK_RightArrow:
+			guard arrowKeyControlsEnabled == true else { return }
+			rightPressed = true
+		case kVK_UpArrow:
+			guard arrowKeyControlsEnabled == true else { return }
+			upPressed = true
+		case kVK_Space:
+			guard spaceInteractionEnabled == true else { return }
+			spaceClicked = true
+			switch gameState {
+			case .part2:
+				step3()
+			case .part4:
+				step5()
+			case .part7:
+				step8()
+			case .part8:
+				step9()
 			default:
 				break
+			}
+		default:
+			break
 		}
 		
 		//something onther than sapce
 		if(gameState == .part5 && !spaceClicked) {
 			step6()
 		}
-
+		
 	}
 	
 	public override func keyUp(with event: NSEvent) {
@@ -715,10 +723,16 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Called before each frame is rendered
 		if leftPressed  { thePlayer.position.x -= 10 }
 		if rightPressed { thePlayer.position.x += 10 }
-		if upPressed && touchingGround {
+		
+		if upPressed && thePlayer.physicsBody?.velocity.dy == 0 {
+			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
+			
+		}
+	
+		/*if upPressed && touchingGround {
 			thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 			touchingGround = false
-		}
+		}*/
 	}
 }
 

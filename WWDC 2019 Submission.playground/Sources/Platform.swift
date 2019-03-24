@@ -11,6 +11,7 @@ public class Platform: SKShapeNode {
 		self.physicsBody?.isDynamic = false
 		self.physicsBody?.restitution = 0.0
 		self.physicsBody?.categoryBitMask = groundCategory
+		self.physicsBody?.collisionBitMask = playerCategory
 		self.physicsBody?.contactTestBitMask = playerCategory
 	}
 }
