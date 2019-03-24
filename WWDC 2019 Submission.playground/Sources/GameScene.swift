@@ -114,7 +114,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.thePlayer.physicsBody?.collisionBitMask = groundCategory
 		
 		//make sure the player cannot go outside of the screen
-		let xRange = SKRange(lowerLimit:((-1*size.width/2) + 10),upperLimit:((size.width/2) - 10))
+		let xRange = SKRange(lowerLimit:((-1*size.width/2) + 50),upperLimit:((size.width/2) - 50))
 		let yRange = SKRange(lowerLimit:((-1*size.height/2) + 10),upperLimit:((size.height/2) - 10))
 		thePlayer.constraints = [SKConstraint.positionX(xRange,y:yRange)]
 		
@@ -381,10 +381,10 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.mouseInteractionEnabled = false
 		self.spaceInteractionEnabled = false
 		
-		delay(1.8) {
+		/*delay(1.8) {
 			self.spaceInteractionEnabled = true
 			self.mouseInteractionEnabled = true
-		}
+		}*/
 		
 		self.label8.removeFromParent()
 		
@@ -408,6 +408,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9.run(fadeInAction)
 		self.label9Line2.run(fadeInAction)
 		self.spaceLabel.run(fadeInAction)
+			
+			delay(1.0) {
+				self.spaceInteractionEnabled = true
+				self.mouseInteractionEnabled = true
+			}
 		}
 	}
 	
