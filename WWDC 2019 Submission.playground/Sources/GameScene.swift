@@ -37,6 +37,9 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	var spaceClicked = false
 	
+	let fadeInAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
+	let fadeOutAction = SKAction.fadeAlpha(to: 0.0, duration: 1.0)
+	
 	//labels
 	let titleLabel = SKLabelNode(text: "INKBLOB")
 	let spaceLabel = SKLabelNode(text: "Press space to proceed")
@@ -323,17 +326,56 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label6.position = CGPoint(x: -290, y: -200)
 		self.addChild(self.label6)
 		
+		let arrowsNormal = SKSpriteNode(texture: SKTexture(imageNamed: "arrowsNormal"))
+		arrowsNormal.setScale(0.5)
+		arrowsNormal.position = CGPoint(x: -290, y: -100)
+		self.addChild(arrowsNormal)
+		
+		
+		let goRight = SKAction.moveTo(x: self.thePlayer.position.x + 100, duration: 1.0)
+		let goLeft = SKAction.moveTo(x: self.thePlayer.position.x - 100, duration: 1.0)
+		let goBack = SKAction.moveTo(x: self.thePlayer.position.x, duration: 1.0)
+		let jump = SKAction.run {
+			self.thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
+		}
+		
+		//delay(0.5) {
+			arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
+			self.thePlayer.run(goRight)
+		
+			delay(1.0) {
+				arrowsNormal.texture = SKTexture(imageNamed: "arrowsLeft")
+				//self.thePlayer.run(goBack)
+				self.thePlayer.run(goLeft)
+					//arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
+					delay(1.0) {
+						arrowsNormal.texture = SKTexture(imageNamed: "arrowsRight")
+						self.thePlayer.run(goBack)
+						
+						delay(1.0) {
+							arrowsNormal.texture = SKTexture(imageNamed: "arrowsUp")
+							self.thePlayer.run(jump)
+							delay(1.0) {
+								arrowsNormal.removeFromParent()
+							}
+						}
+					//}
+				}
+			}
+		//}
+		
 		//animation
-		let goRight = SKAction.moveTo(x: self.thePlayer.position.x + 100, duration: 0.5)
-		let goLeft = SKAction.moveTo(x: self.thePlayer.position.x - 100, duration: 0.5)
-		let goBack = SKAction.moveTo(x: self.thePlayer.position.x, duration: 0.5)
+		/*
+		let goRight = SKAction.moveTo(x: self.thePlayer.position.x + 100, duration: 1.0)
+		let goLeft = SKAction.moveTo(x: self.thePlayer.position.x - 200, duration: 2.0)
+		let goBack = SKAction.moveTo(x: self.thePlayer.position.x, duration: 1.0)
 		let jump = SKAction.run {
 			self.thePlayer.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 20))
 		}
 		let sequence = SKAction.sequence([goRight, goLeft, goBack, jump])
-		thePlayer.run(sequence)
+		delay(0.5) {self.thePlayer.run(sequence)} */
 		
-		delay(2.5) {
+		delay(4.0) {
 			self.step6()
 			self.arrowKeyControlsEnabled = true
 		}
@@ -345,10 +387,6 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.gameState = .part6
 		
 		self.label6.removeFromParent()
-		
-		/*delay(2.0) {
-		self.arrowKeyControlsEnabled = false
-		}*/
 		
 		self.label8.fontColor = .black
 		self.label8.fontSize = 35
@@ -382,14 +420,14 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9.position = CGPoint(x: 150, y: -20)
 		self.label9Line2.fontColor = .white
 		self.label9Line2.fontSize = 25
-		self.label9Line2.position = CGPoint(x: 150, y: -50)
+		self.label9Line2.position = CGPoint(x: 150, y: -60)
 		self.label9.alpha = 0.0
 		self.label9Line2.alpha = 0.0
 		
 		delay(2.1) {
 		let fadeInAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
 		fadeInAction.timingMode = .easeIn
-		self.spaceLabel.position = CGPoint(x: self.label9Line2.position.x, y: self.label9Line2.position.y - 30)
+		self.spaceLabel.position = CGPoint(x: self.label9Line2.position.x, y: self.label9Line2.position.y - 40)
 		self.spaceLabel.alpha = 0.0
 		self.addChild(self.spaceLabel)
 		self.addChild(self.label9)
@@ -398,29 +436,15 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		self.label9Line2.run(fadeInAction)
 		self.spaceLabel.run(fadeInAction)
 		}
-		
-		//ink explain label #1
-		
 	}
 	
 	func step8() {
 		print("step 8 started")
 		self.gameState = .part8
 		
-		let fadeOutAction = SKAction.fadeAlpha(to: 0.0, duration: 1.0)
-		fadeInAction.timingMode = .easeIn
-		
 		self.label9.run(fadeOutAction)
 		self.label9Line2.run(fadeOutAction)
 		self.spaceLabel.run(fadeOutAction)
-		/*self.spaceLabel.removeFromParent()
-		goodLuck.fontColor = .white
-		goodLuck.fontSize = 40
-		goodLuck.fontName = "AvenirNext-Bold"
-		goodLuck.position = CGPoint(x: 150, y: 25)
-		addChild(goodLuck)*/
-		//label9.text = "Press space to start the first level."
-		//label9Line2.text = ""
 		
 		delay(1.0) {
 			//add the other platforms
@@ -441,33 +465,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 			platform2.run(self.fadeInAction)
 		}
 		
-		//print("numberOfPlatforms: \(numberOfPlatforms)")
-		
 		self.gameState = .playing
 		
 	}
 	
 	func step9() {
-		/*
-		print("step 9 started")
-		self.label9Line2.removeFromParent()
-		self.label9.removeFromParent()
-		self.goodLuck.removeFromParent()
-		
-		currentLevel += 1
-		
-		if(currentLevel <= levelsArray.count) {
-			//remove player instantly
-			self.transistionAnimation()
-			
-			//unload level and load next level
-			delay(3.5) {
-				self.arrowKeyControlsEnabled = true
-				if let child = self.childNode(withName: "player") as? SKShapeNode { child.removeFromParent() }
-				self.unloadLevel()
-				self.loadLevel(self.levelsArray[self.currentLevel - 1])
-			}
-		}*/
 	}
 	
 	func loadLevel(_ level: Level) {
@@ -572,6 +574,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		title.text = "LEVEL \(currentLevel - 1)"
 		title.fontSize = 50
+		title.fontName = "AvenirNext-Heavy"
 		title.setScale(0.0)
 		title.fontColor = .white
 		title.zPosition = 2
@@ -587,10 +590,11 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 	func winnerAnimation() {
 		let shaderTest: InkBlob = InkBlob(rectOf: CGSize(width: 1200, height: 1200))
 		shaderTest.setupProperties(pos: CGPoint(x:0,y:0), inBack: false)
-		shaderTest.animate(amount: 3.5)
+		shaderTest.animate(amount: 4.5)
 		addChild(shaderTest)
 		
 		title.text = "YOU WON"
+		title.fontName = "AvenirNext-Heavy"
 		title.fontSize = 50
 		title.setScale(0.0)
 		title.fontColor = .white
@@ -598,6 +602,7 @@ public class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		let scoreLabel = SKLabelNode(text: "Score \(1000 - (totalBlobsAdded * 10))")
 		scoreLabel.fontSize = 25
+		scoreLabel.fontName = "AvenirNext-Bold"
 		scoreLabel.position.y = -60
 		scoreLabel.setScale(0.0)
 		scoreLabel.fontColor = .white
